@@ -26,12 +26,12 @@ const getStatusBadge = (status: "unpaid" | "pending" | "rejected" | "verified" |
     case "pending":
       return {
         label: "Pending Review",
-        className: "border-secondary/20 bg-secondary/10 text-secondary",
+        className: "border-warning bg-warning-muted text-warning-foreground",
       };
     case "verified":
       return {
         label: "Approved",
-        className: "border-primary/20 bg-primary/10 text-primary",
+        className: "border-success/40 bg-success-muted text-success",
       };
     case "rejected":
       return {
@@ -41,7 +41,7 @@ const getStatusBadge = (status: "unpaid" | "pending" | "rejected" | "verified" |
     case "unpaid":
       return {
         label: "Unpaid",
-        className: "border-secondary/20 bg-secondary/10 text-secondary",
+        className: "border-primary/20 bg-primary/10 text-primary",
       };
     case "cleared":
       return {
@@ -51,7 +51,7 @@ const getStatusBadge = (status: "unpaid" | "pending" | "rejected" | "verified" |
     default:
       return {
         label: "Unpaid",
-        className: "border-secondary/20 bg-secondary/10 text-secondary",
+        className: "border-primary/20 bg-primary/10 text-primary",
       };
   }
 };
@@ -120,9 +120,9 @@ export default function OrganizationSelectionPage({
 
   return (
     <div className="min-h-screen bg-background py-8 px-4 relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
@@ -143,7 +143,7 @@ export default function OrganizationSelectionPage({
         </Button>
 
         {/* Term & Student Info Banner Card */}
-        <Card className="border-border bg-primary/5 shadow-soft">
+        <Card className="border-border bg-primary/5">
           <CardContent className="px-4 sm:px-6 py-4 space-y-4">
             {/* Term Row */}
             {selectedTerm && (
@@ -186,9 +186,9 @@ export default function OrganizationSelectionPage({
         </Card>
 
         {/* Organization Selection Card */}
-        <Card className="bg-card border border-border/50 shadow-soft">
+        <Card className="bg-card border border-border/50">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-bold font-serif">Select Organization</CardTitle>
+            <CardTitle className="text-2xl font-bold">Select Organization</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Choose the organization you want to pay fees or fines for
             </CardDescription>
@@ -215,14 +215,14 @@ export default function OrganizationSelectionPage({
                         key={org.id}
                         onClick={() => handleOrgSelect(org.id)}
                         disabled={!isPayable}
-                        className={`w-full text-left p-4 rounded-[1.5rem] border-2 transition-all duration-300 flex items-start justify-between gap-4 outline-none cursor-pointer ${
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-start justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer ${
                           isPayable
                             ? "hover:border-primary/50 hover:bg-primary/5"
                             : "opacity-70 cursor-not-allowed"
                         } ${
                           selectedOrg === org.id && isPayable
-                            ? "border-primary bg-primary/5 shadow-soft"
-                            : "border-border bg-white/50"
+                            ? "border-primary bg-primary/5 shadow-sm"
+                            : "border-border bg-card"
                         }`}
                       >
                         <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">

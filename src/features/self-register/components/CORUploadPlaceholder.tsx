@@ -106,9 +106,9 @@ export function CORUpload({ value, onChange }: CORUploadProps) {
           onClick={() => inputRef.current?.click()}
           onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
           className={cn(
-            "flex cursor-pointer flex-col items-center gap-3 rounded-[1.5rem] border-2 border-dashed px-4 py-8 text-center transition-all duration-300 outline-none",
+            "flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-all duration-300 outline-none",
             isDragging
-              ? "border-primary bg-primary/10 shadow-soft"
+              ? "border-primary bg-primary/10 shadow-sm"
               : "border-border bg-primary/5 hover:border-primary/50 hover:bg-primary/10",
             "focus-visible:ring-2 focus-visible:ring-primary/30"
           )}
@@ -139,7 +139,7 @@ export function CORUpload({ value, onChange }: CORUploadProps) {
           />
         </div>
       ) : (
-        <div className="flex items-start gap-4 rounded-[1.5rem] border border-border bg-primary/5 p-4">
+        <div className="flex items-start gap-4 rounded-lg border border-border bg-primary/5 p-4">
           {/* Image preview or file icon */}
           {value.previewUrl ? (
             <img
@@ -163,7 +163,7 @@ export function CORUpload({ value, onChange }: CORUploadProps) {
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="mt-1 text-xs text-primary underline underline-offset-2 hover:text-secondary font-bold cursor-pointer"
+              className="mt-1 text-xs text-primary underline underline-offset-2 hover:text-primary/80 font-bold cursor-pointer"
             >
               Replace file
             </button>

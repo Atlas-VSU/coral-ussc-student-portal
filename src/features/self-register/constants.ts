@@ -25,11 +25,3 @@ export const selfRegisterSchema = z.object({
 export type SelfRegisterFormData = z.infer<typeof selfRegisterSchema>;
 
 export const YEAR_LEVELS = [1, 2, 3, 4, 5, 6];
-
-// Shared light/green field styling 
-export const lightInputClass =
-  "!bg-white/50 !text-foreground placeholder:!text-muted-foreground !border-border focus-visible:!ring-primary/30 focus-visible:!ring-offset-2 rounded-full h-12 px-6";
-export const lightSelectTriggerClass =
-  "w-full !bg-white/50 !text-foreground !border-border hover:bg-accent/10 focus-visible:!ring-primary/30 focus-visible:!ring-offset-2 truncate rounded-full h-12 px-6";
-export const lightSelectContentClass = "bg-card text-foreground !border-border rounded-xl";
-export const lightSelectItemClass = "text-foreground focus:bg-primary/10 focus:text-foreground";

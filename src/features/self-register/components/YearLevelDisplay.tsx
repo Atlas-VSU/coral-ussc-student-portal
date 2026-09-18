@@ -1,8 +1,5 @@
 import type { UseFormReturn } from "react-hook-form";
 import {
-  lightSelectContentClass,
-  lightSelectTriggerClass,
-  lightSelectItemClass,
   YEAR_LEVELS,
   type SelfRegisterFormData,
 } from "../constants";
@@ -33,7 +30,7 @@ export function YearLevelSelection({ form }: YearLevelSelectionProps) {
       name="yearLevel"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-[#1B5E20] font-semibold">
+          <FormLabel className="text-primary font-semibold">
             Year Level
           </FormLabel>
           <Select
@@ -41,16 +38,15 @@ export function YearLevelSelection({ form }: YearLevelSelectionProps) {
             value={String(field.value)}
           >
             <FormControl>
-              <SelectTrigger className={lightSelectTriggerClass}>
+              <SelectTrigger className="w-full truncate">
                 <SelectValue placeholder="Select your year level" />
               </SelectTrigger>
             </FormControl>
-            <SelectContent className={lightSelectContentClass}>
+            <SelectContent>
               {YEAR_LEVELS.map((level) => (
                 <SelectItem
                   key={level}
                   value={String(level)}
-                  className={lightSelectItemClass}
                 >
                   {level == 1 ? "1st Year" : level == 2 ? "2nd Year" : level == 3 ? "3rd Year" : level == 4 ? "4th Year" : level == 5 ? "5th Year" : "6th Year"}
                 </SelectItem>

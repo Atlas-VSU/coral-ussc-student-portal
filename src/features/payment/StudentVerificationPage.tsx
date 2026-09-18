@@ -185,9 +185,9 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="relative z-10 w-full max-w-md flex flex-col items-center">
         <PaymentBrandHeader stepLabel="Enter your student information to continue" />
@@ -198,12 +198,12 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
           />
         </div>
         
-        <Card className="w-full bg-card border border-border/50 p-0 shadow-soft">
+        <Card className="w-full bg-card border border-border/50 p-0">
           <CardContent className="px-4 sm:px-6 py-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Student ID Input */}
               <div className="space-y-2">
-                <Label htmlFor="studentId" className="text-foreground font-bold text-sm">
+                <Label htmlFor="studentId" className="text-primary font-semibold text-sm">
                   Student ID <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -223,7 +223,7 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
 
               {/* Program Selection */}
               <div className="space-y-2">
-                <Label htmlFor="program" className="text-foreground font-bold text-sm">
+                <Label htmlFor="program" className="text-primary font-semibold text-sm">
                   Program <span className="text-destructive">*</span>
                 </Label>
                 <Select
@@ -234,19 +234,19 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
                     clearErrors("program");
                   }}
                 >
-                  <SelectTrigger className={`w-full !bg-white/50 !text-foreground !border-border hover:bg-accent/10 focus-visible:!ring-primary/30 focus-visible:!ring-offset-2 truncate rounded-full h-12 px-6 ${errors.program ? "border-destructive" : ""}`}>
+                  <SelectTrigger className={`w-full truncate ${errors.program ? "border-destructive" : ""}`}>
                     <SelectValue placeholder={isLoadingPrograms ? "Loading programs..." : "Select your program"} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card text-foreground border-border rounded-xl">
+                  <SelectContent>
                     {programOptions.map((program) => (
-                      <SelectItem key={program.value} value={program.value} className="text-foreground focus:bg-primary/10 focus:text-foreground">
+                      <SelectItem key={program.value} value={program.value}>
                         {program.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {programLoadError && !errors.program && (
-                  <p className="text-xs text-amber-600">{programLoadError}</p>
+                  <p className="text-xs text-warning-foreground">{programLoadError}</p>
                 )}
                 {errors.program && (
                   <p className="text-xs text-destructive flex items-center gap-1 font-medium">
@@ -256,7 +256,7 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
               </div>
 
               {submitError && (
-                <p className="text-sm text-destructive rounded-[1rem] bg-destructive/10 border border-destructive/20 px-4 py-3 font-medium">
+                <p className="text-sm text-destructive rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 font-medium">
                   {submitError}
                 </p>
               )}

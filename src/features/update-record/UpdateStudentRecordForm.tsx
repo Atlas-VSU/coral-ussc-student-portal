@@ -26,10 +26,6 @@ import {
   UpdateRecordFormData,
   YEAR_LEVELS,
   formatYearLevel,
-  lightInputClass,
-  lightSelectTriggerClass,
-  lightSelectContentClass,
-  lightSelectItemClass,
 } from "./constants";
 
 interface UpdateStudentRecordFormProps {
@@ -113,12 +109,12 @@ export function UpdateStudentRecordForm({
   if (submitted) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-card border border-border/50 p-0 shadow-float">
+        <Card className="w-full max-w-md bg-card border border-border/50 p-0">
           <CardContent className="px-6 py-10 flex flex-col items-center text-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <CheckCircle2 className="w-9 h-9 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold font-serif text-primary">Record Updated!</h2>
+            <h2 className="text-2xl font-bold text-primary">Record Updated!</h2>
             <p className="text-sm text-muted-foreground max-w-xs">
               Your student record has been successfully updated. If you have any
               questions, please contact your organization officer.
@@ -132,20 +128,8 @@ export function UpdateStudentRecordForm({
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 py-8 sm:py-12">
       <div className="mb-8 flex flex-col items-center gap-3 text-center">
-        <div className="flex size-14 items-center justify-center rounded-full bg-primary p-2 border border-border/10 shadow-sm mb-2 text-primary-foreground">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-9 w-9"
-          >
-            <path d="M4 4l8 16 8-16M8 4l4 8 4-8" />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-extrabold font-serif text-foreground">
+        <Image src="/images/ussc-logo-1.webp" alt="USSC Connect" width={56} height={56} className="size-14 mb-2 object-contain" />
+        <h1 className="text-3xl font-extrabold text-foreground">
           Update Student Record
         </h1>
         <p className="max-w-md text-sm text-muted-foreground">
@@ -154,11 +138,11 @@ export function UpdateStudentRecordForm({
         </p>
       </div>
 
-      <Card className="w-full max-w-2xl bg-card border border-border/50 p-0 shadow-soft">
+      <Card className="w-full max-w-2xl bg-card border border-border/50 p-0">
         <CardContent className="px-6 py-8">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mb-6">
             <div className="space-y-2">
-              <Label className="text-foreground font-bold text-sm">
+              <Label className="text-primary font-semibold text-sm">
                 Student ID
               </Label>
               <Input
@@ -168,7 +152,7 @@ export function UpdateStudentRecordForm({
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-bold text-sm">
+              <Label className="text-primary font-semibold text-sm">
                 Email
               </Label>
               <Input
@@ -190,11 +174,11 @@ export function UpdateStudentRecordForm({
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground font-bold text-sm">
+                      <FormLabel className="text-primary font-semibold text-sm">
                         First Name
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} className={lightInputClass} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -206,11 +190,11 @@ export function UpdateStudentRecordForm({
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground font-bold text-sm">
+                      <FormLabel className="text-primary font-semibold text-sm">
                         Last Name
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} className={lightInputClass} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -222,7 +206,7 @@ export function UpdateStudentRecordForm({
                   name="programId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground font-bold text-sm">
+                      <FormLabel className="text-primary font-semibold text-sm">
                         Program
                       </FormLabel>
                       <Select
@@ -231,7 +215,7 @@ export function UpdateStudentRecordForm({
                         disabled={isLoadingPrograms}
                       >
                         <FormControl>
-                          <SelectTrigger className={lightSelectTriggerClass}>
+                          <SelectTrigger className="w-full truncate">
                             <SelectValue
                               placeholder={
                                 isLoadingPrograms
@@ -241,12 +225,11 @@ export function UpdateStudentRecordForm({
                             />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className={lightSelectContentClass}>
+                        <SelectContent>
                           {programOptions.map((p) => (
                             <SelectItem
                               key={p.value}
                               value={p.value}
-                              className={lightSelectItemClass}
                             >
                               {p.label}
                             </SelectItem>
@@ -254,7 +237,7 @@ export function UpdateStudentRecordForm({
                         </SelectContent>
                       </Select>
                       {programLoadError && (
-                        <p className="text-xs text-amber-600">{programLoadError}</p>
+                        <p className="text-xs text-warning-foreground">{programLoadError}</p>
                       )}
                       <FormMessage />
                     </FormItem>
@@ -266,7 +249,7 @@ export function UpdateStudentRecordForm({
                   name="yearLevel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground font-bold text-sm">
+                      <FormLabel className="text-primary font-semibold text-sm">
                         Year Level
                       </FormLabel>
                       <Select
@@ -274,16 +257,15 @@ export function UpdateStudentRecordForm({
                         value={String(field.value)}
                       >
                         <FormControl>
-                          <SelectTrigger className={lightSelectTriggerClass}>
+                          <SelectTrigger className="w-full truncate">
                             <SelectValue placeholder="Select your year level" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className={lightSelectContentClass}>
+                        <SelectContent>
                           {YEAR_LEVELS.map((level) => (
                             <SelectItem
                               key={level}
                               value={String(level)}
-                              className={lightSelectItemClass}
                             >
                               {formatYearLevel(level)}
                             </SelectItem>
@@ -301,7 +283,7 @@ export function UpdateStudentRecordForm({
                 onExpire={() => setRecaptchaToken(null)}
               />
 
-              <div className="bg-primary/5 p-5 rounded-[1.5rem] border border-primary/20">
+              <div className="bg-primary/5 p-5 rounded-lg border border-primary/20">
                 <div className="flex items-start gap-3">
                   <Checkbox
                     id="update-consent"
@@ -309,7 +291,7 @@ export function UpdateStudentRecordForm({
                     onCheckedChange={(checked) =>
                       setAgreed(checked === true)
                     }
-                    className="mt-0.5 rounded-md border-border bg-white data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus-visible:ring-primary/30"
+                    className="mt-0.5"
                   />
                   <Label
                     htmlFor="update-consent"

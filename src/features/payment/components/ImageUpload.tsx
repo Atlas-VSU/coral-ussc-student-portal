@@ -68,7 +68,7 @@ export function ImageUpload({ value, onChange, error }: ImageUploadProps) {
           <div className="rounded-md border bg-muted/30 px-3 py-2.5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
-                <p className="text-xs font-medium text-emerald-700 flex items-center gap-1.5">
+                <p className="text-xs font-medium text-success flex items-center gap-1.5">
                   <CheckCircle2 className="size-3.5" />
                   Uploaded
                 </p>
@@ -97,8 +97,8 @@ export function ImageUpload({ value, onChange, error }: ImageUploadProps) {
           className={`
             flex flex-col items-center gap-3 rounded-lg border-2 border-dashed px-4 py-8
             cursor-pointer transition-colors text-center
-            ${dragging ? "border-green-500 bg-green-50" : ""}
-            ${error  ? "border-destructive" : "border-border hover:border-green-400 hover:bg-green-50/50"}
+            ${dragging ? "border-primary bg-primary/5" : ""}
+            ${error  ? "border-destructive" : "border-border hover:border-primary/50 hover:bg-primary/5"}
           `}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -108,7 +108,7 @@ export function ImageUpload({ value, onChange, error }: ImageUploadProps) {
             <p className="text-sm font-semibold text-foreground">Drop receipt image here</p>
             <p className="text-xs text-muted-foreground mt-1">
               or{" "}
-              <span className="text-green-600 font-semibold">click to browse</span>
+              <span className="text-primary font-semibold">click to browse</span>
               {" "}· PNG, JPG, WEBP
             </p>
           </div>

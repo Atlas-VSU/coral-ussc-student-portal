@@ -101,20 +101,8 @@ export function SelfRegisterForm({ initialEmail = "", token = "" }: SelfRegister
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 py-8 sm:py-12">
       <div className="mb-8 flex flex-col items-center gap-3 text-center">
-        <div className="flex size-14 items-center justify-center rounded-full bg-primary p-2 border border-border/10 shadow-sm mb-2 text-primary-foreground">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-9 w-9"
-          >
-            <path d="M4 4l8 16 8-16M8 4l4 8 4-8" />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-extrabold font-serif text-foreground">
+        <Image src="/images/ussc-logo-1.webp" alt="USSC Connect" width={56} height={56} className="size-14 mb-2 object-contain" />
+        <h1 className="text-3xl font-extrabold text-foreground">
           Self-Registration
         </h1>
         <p className="max-w-md text-sm text-muted-foreground">
@@ -124,7 +112,7 @@ export function SelfRegisterForm({ initialEmail = "", token = "" }: SelfRegister
         </p>
       </div>
 
-      <Card className="w-full max-w-2xl bg-card border border-border/50 p-0 shadow-soft">
+      <Card className="w-full max-w-2xl bg-card border border-border/50 p-0">
         <CardContent className="px-6 py-8">
           <Form {...form}>
             <form

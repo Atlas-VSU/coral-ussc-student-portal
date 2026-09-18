@@ -20,7 +20,7 @@ function SelfRegisterContent() {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4 text-center">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
-          <h2 className="text-xl font-bold font-serif text-foreground">Verifying your registration link...</h2>
+          <h2 className="text-xl font-bold text-foreground">Verifying your registration link...</h2>
           <p className="text-sm text-muted-foreground">Please wait a moment while we validate your access.</p>
         </div>
       </div>
@@ -30,12 +30,12 @@ function SelfRegisterContent() {
   if (status === "error") {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-card border border-destructive/20 p-0 shadow-float">
+        <Card className="w-full max-w-md bg-card border border-destructive/20 p-0">
           <CardContent className="p-8 flex flex-col items-center text-center">
             <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-5">
               <AlertCircle className="w-7 h-7 text-destructive" />
             </div>
-            <h2 className="text-2xl font-bold font-serif text-destructive mb-3">Access Denied</h2>
+            <h2 className="text-2xl font-bold text-destructive mb-3">Access Denied</h2>
             <p className="text-sm text-muted-foreground mb-8">
               {errorMessage}
             </p>

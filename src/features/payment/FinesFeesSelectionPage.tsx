@@ -71,13 +71,13 @@ export default function FinesFeesSelectionPage({
     if (item.paymentState === "verified") {
       return {
         label: "Approved",
-        className: "border-green-600/20 bg-green-600/10 text-green-700",
+        className: "border-success/40 bg-success-muted text-success",
       };
     }
     if (item.paymentState === "pending" || (!item.isPayable && item.paymentState !== "rejected")) {
       return {
         label: "Pending",
-        className: "border-secondary/20 bg-secondary/10 text-secondary",
+        className: "border-warning bg-warning-muted text-warning-foreground",
       };
     }
 
@@ -223,9 +223,9 @@ export default function FinesFeesSelectionPage({
 
   return (
     <div className="min-h-screen bg-background py-8 pb-36 px-4 relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="max-w-5xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
@@ -240,7 +240,7 @@ export default function FinesFeesSelectionPage({
         </Button>
 
         {/* Term, Student & Organization Info Banner Card */}
-        <Card className="border-border bg-primary/5 shadow-soft">
+        <Card className="border-border bg-primary/5">
           <CardContent className="px-4 sm:px-6 py-5 space-y-4">
             {/* Term Row */}
             {selectedTerm && (
@@ -296,12 +296,12 @@ export default function FinesFeesSelectionPage({
         </Card>
 
         {isViewOnly && (
-          <Card className="border-amber-300 bg-amber-50 shadow-soft">
+          <Card className="border-warning bg-warning-muted">
             <CardContent className="px-4 sm:px-6 py-4">
-              <p className="text-sm font-bold text-amber-800">
+              <p className="text-sm font-bold text-warning-foreground">
                 View only — you are no longer enrolled
               </p>
-              <p className="text-xs text-amber-700 font-medium mt-0.5">
+              <p className="text-xs text-warning-foreground font-medium mt-0.5">
                 These are your records and payment history for this term. They are shown
                 for reference and cannot be paid against. If you believe this is wrong,
                 contact your organization.
@@ -312,12 +312,12 @@ export default function FinesFeesSelectionPage({
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Fees Section */}
-          <Card className="h-fit bg-card border border-border/50 shadow-soft">
+          <Card className="h-fit bg-card border border-border/50">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Receipt className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-xl font-bold font-serif">Organization Fees</CardTitle>
+                  <CardTitle className="text-xl font-bold">Organization Fees</CardTitle>
                 </div>
                 <Badge variant="outline" className="text-primary rounded-full font-bold">
                   ₱{feesTotal.toFixed(2)}
@@ -330,11 +330,11 @@ export default function FinesFeesSelectionPage({
               {fees.length > 0 && (
                 <>
                   <div
-                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-[1.5rem] border-2 transition-all duration-300 ${
+                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
                       allFeesSelected
-                        ? "bg-primary/10 border-primary shadow-soft"
+                        ? "bg-primary/10 border-primary shadow-sm"
                         : hasPayableFees
-                          ? "bg-white/50 border-border hover:bg-primary/5 cursor-pointer"
+                          ? "bg-card border-border hover:bg-primary/5 cursor-pointer"
                           : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
                     }`}
                     onClick={() => {
@@ -351,7 +351,7 @@ export default function FinesFeesSelectionPage({
                         toggleAllFees(checked === true);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="rounded-md border-border bg-white data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus-visible:ring-primary/30"
+                     
                     />
                     <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                       Select All Fees
@@ -366,7 +366,7 @@ export default function FinesFeesSelectionPage({
                     </span>
                   </div>
                   {!hasPayableFees && (
-                    <p className="text-xs text-amber-600 px-1 font-medium">
+                    <p className="text-xs text-warning-foreground px-1 font-medium">
                       {fees.some(f => f.paymentState === "pending")
                         ? "All fee items are currently pending verification or verified and cannot be selected."
                         : "All fee items are already verified and cannot be selected."}
@@ -398,10 +398,10 @@ export default function FinesFeesSelectionPage({
                     }}
                     className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
                       !isSelectable
-                        ? "bg-secondary/5 border-border/50"
+                        ? "bg-muted/40 border-border/50"
                         : isSelected
                           ? "bg-primary/10 border-primary cursor-pointer"
-                          : "bg-white/50 border-border/30 hover:bg-primary/5 cursor-pointer"
+                          : "bg-card border-border hover:bg-primary/5 cursor-pointer"
                     }`}
                   >
                     <Checkbox
@@ -410,7 +410,7 @@ export default function FinesFeesSelectionPage({
                       aria-label={`Select ${fee.description}`}
                       onCheckedChange={() => isSelectable && toggleFee(fee.id)}
                       onClick={(e) => e.stopPropagation()}
-                      className="mt-0.5 rounded-md border-border bg-white data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus-visible:ring-primary/30"
+                      className="mt-0.5"
                     />
                     <div className="flex-1 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -428,7 +428,7 @@ export default function FinesFeesSelectionPage({
                         <p className="text-xs text-muted-foreground font-medium">Due: {formatDisplayDate(fee.dueDate)}</p>
                       )}
                       {fee.paymentState === "pending" && (
-                        <p className="text-xs text-amber-600 font-medium">
+                        <p className="text-xs text-warning-foreground font-medium">
                           Status: Pending verification (not selectable)
                         </p>
                       )}
@@ -459,14 +459,14 @@ export default function FinesFeesSelectionPage({
           </Card>
 
           {/* Fines Section */}
-          <Card className="h-fit bg-card border border-border/50 shadow-soft">
+          <Card className="h-fit bg-card border border-border/50">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-secondary" />
-                  <CardTitle className="text-xl font-bold font-serif">Fines & Penalties</CardTitle>
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  <CardTitle className="text-xl font-bold">Fines & Penalties</CardTitle>
                 </div>
-                <Badge variant="outline" className="text-secondary rounded-full font-bold">
+                <Badge variant="outline" className="text-destructive rounded-full font-bold">
                   ₱{finesTotal.toFixed(2)}
                 </Badge>
               </div>
@@ -477,11 +477,11 @@ export default function FinesFeesSelectionPage({
               {(pendingFines.length > 0 || payableFines.length > 0) && (
                 <>
                   <div
-                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-[1.5rem] border-2 transition-all duration-300 ${
+                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
                       allFinesSelected
-                        ? "bg-secondary/10 border-secondary shadow-soft"
+                        ? "bg-destructive/10 border-destructive shadow-sm"
                         : hasPayableFineItems
-                          ? "bg-white/50 border-border hover:bg-secondary/5 cursor-pointer"
+                          ? "bg-card border-border hover:bg-destructive/5 cursor-pointer"
                           : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
                     }`}
                     onClick={() => {
@@ -498,7 +498,7 @@ export default function FinesFeesSelectionPage({
                         toggleAllFineItems(checked === true);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="rounded-md border-border bg-white data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground focus-visible:ring-secondary/30"
+                     
                     />
                     <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                       Select All Fines
@@ -508,12 +508,12 @@ export default function FinesFeesSelectionPage({
                         </span>
                       )}
                     </span>
-                    <span className="text-lg font-bold text-secondary shrink-0 tabular-nums">
+                    <span className="text-lg font-bold text-destructive shrink-0 tabular-nums">
                       ₱{finesPayableTotal.toFixed(2)}
                     </span>
                   </div>
                   {!hasPayableFineItems && (
-                    <p className="text-xs text-amber-600 px-1 font-medium">
+                    <p className="text-xs text-warning-foreground px-1 font-medium">
                       {fineItems.some(f => f.isPending)
                         ? "All fine items are currently pending verification or verified and cannot be selected."
                         : "All fine items are already verified and cannot be selected."}
@@ -557,10 +557,10 @@ export default function FinesFeesSelectionPage({
                       }}
                       className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
                         !isSelectable
-                          ? "bg-secondary/5 border-border/50"
+                          ? "bg-muted/40 border-border/50"
                           : isSelected
-                            ? "bg-secondary/10 border-secondary cursor-pointer"
-                            : "bg-white/50 border-border/30 hover:bg-secondary/5 cursor-pointer"
+                            ? "bg-destructive/10 border-destructive cursor-pointer"
+                            : "bg-card border-border hover:bg-destructive/5 cursor-pointer"
                       }`}
                     >
                       <Checkbox
@@ -569,7 +569,7 @@ export default function FinesFeesSelectionPage({
                         aria-label={`Select ${fine.title}`}
                         onCheckedChange={() => isSelectable && toggleFineItem(fine.refId)}
                         onClick={(e) => e.stopPropagation()}
-                        className="mt-0.5 rounded-md border-border bg-white data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground focus-visible:ring-secondary/30"
+                        className="mt-0.5"
                       />
                       <div className="flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
@@ -585,12 +585,12 @@ export default function FinesFeesSelectionPage({
                           <p className="text-xs text-muted-foreground italic font-medium">{parentFine.reason}</p>
                         )}
                         {fine.isPending && (
-                          <p className="text-xs text-amber-600 font-medium">
+                          <p className="text-xs text-warning-foreground font-medium">
                             Status: Pending verification (not selectable)
                           </p>
                         )}
                         {fine.isPaid && !fine.isPending && (
-                          <p className="text-xs text-green-700 font-medium">
+                          <p className="text-xs text-success font-medium">
                             {fine.isWaived ? "Waived by the organization" : "Settled"}
                           </p>
                         )}
@@ -602,7 +602,7 @@ export default function FinesFeesSelectionPage({
                           </p>
                         )}
                       </div>
-                      <span className="text-sm font-bold text-secondary shrink-0 tabular-nums">
+                      <span className="text-sm font-bold text-destructive shrink-0 tabular-nums">
                         ₱{fine.amount.toFixed(2)}
                       </span>
                     </div>
@@ -621,7 +621,7 @@ export default function FinesFeesSelectionPage({
         </div>
 
         {/* Floating Checkout Bar at the Bottom */}
-        <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-[#FDFCF8]/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-float">
+        <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-background/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-lg">
           <div className="mx-auto max-w-5xl flex items-center justify-between gap-3 sm:gap-4">
             <div className="min-w-0">
               {isViewOnly ? (
@@ -629,7 +629,7 @@ export default function FinesFeesSelectionPage({
                   <p className="text-xs text-muted-foreground font-medium">
                     Outstanding on record for this term
                   </p>
-                  <p className="text-2xl font-bold font-serif text-muted-foreground">
+                  <p className="text-2xl font-bold text-muted-foreground">
                     ₱{(feesTotal + finesTotal).toFixed(2)}
                   </p>
                 </>
@@ -643,7 +643,7 @@ export default function FinesFeesSelectionPage({
                         ? `Total for ${selectedCount} selected item${selectedCount === 1 ? "" : "s"}`
                         : "Select the items you want to pay"}
                   </p>
-                  <p className="text-xl sm:text-2xl font-bold font-serif text-primary tabular-nums">₱{grandTotal.toFixed(2)}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary tabular-nums">₱{grandTotal.toFixed(2)}</p>
                 </>
               )}
             </div>

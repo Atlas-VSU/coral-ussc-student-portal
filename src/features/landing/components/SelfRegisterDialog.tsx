@@ -37,7 +37,7 @@ export function SelfRegisterDialog({ isOpen, onOpenChange }: SelfRegisterDialogP
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 rounded-[2rem] p-8 shadow-float overflow-hidden">
+      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
         <DialogHeader className="items-center text-center">
           {!sendSuccess ? (
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
@@ -48,7 +48,7 @@ export function SelfRegisterDialog({ isOpen, onOpenChange }: SelfRegisterDialogP
               <CheckCircle className="w-7 h-7 text-primary" />
             </div>
           )}
-          <DialogTitle className="text-2xl font-bold font-serif text-foreground">
+          <DialogTitle className="text-2xl font-bold text-foreground">
             {!sendSuccess ? "Verify Your Email" : "Verification Link Sent"}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm max-w-sm">

@@ -1,11 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens are kept in sync with Coral-USSC: every value in :root below is
+ * Coral's own :root value (coral-ussc/src/app/globals.css), which veris-frontend
+ * ships unchanged as well. Mappings, exceptions and usage rules: DESIGN_TOKENS.md.
+ */
+
+/* Light-only, as in Coral-USSC: compiles every `dark:` variant away. */
+@variant dark (false);
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-nunito);
-  --font-serif: var(--font-fraunces);
-  --font-mono: var(--font-nunito);
+  --font-sans: var(--font-montserrat);
+  --font-mono: var(--font-montserrat);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -22,6 +30,21 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Coral declares these but never registers them, so its `bg-warning` /
+     `text-success` classes compile to nothing; veris-frontend registers them. */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-muted: var(--warning-muted);
+  /* USSC Brand — the greens Coral's homepage renders (HomePageLayout,
+     LoginCard, DesktopHeader), registered the way veris-frontend registers
+     its --color-brand-* palette. */
+  --color-brand-ink: #1f7700;
+  --color-brand-green: #2e7d32;
+  --color-brand-leaf: #8bc34a;
+  --color-brand-meadow: #66bd4a;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -33,76 +56,66 @@
 }
 
 :root {
-  --radius: 1.5rem;
+  --radius: 0.65rem;
 
-  /* Base - Organic Light Mode */
-  --background: #FDFCF8;
-  --foreground: #2C2C24;
-  --card: #FEFEFA;
-  --card-foreground: #2C2C24;
-  --popover: #FEFEFA;
-  --popover-foreground: #2C2C24;
+  /* Base - light mode*/
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.14 0.06 148);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.14 0.06 148);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.14 0.06 148);
 
-  /* Brand - Moss, Clay, Sand */
-  --primary: #5D7052;
-  --primary-foreground: #F3F4F1;
-  --secondary: #C18C5D;
-  --secondary-foreground: #FFFFFF;
-  --accent: #E6DCCD;
-  --accent-foreground: #4A4A40;
-  
-  --muted: #F0EBE5;
-  --muted-foreground: #78786C;
-  --border: #DED8CF;
-  --input: #DED8CF;
-  --ring: #5D7052;
+  /* Primary — USSCPrimaryGreen */
+  --primary: #058c11;
+  --primary-foreground: #ffffff;
+  /* Secondary — SecondaryGreen */
+  --secondary: #38b000;
+  --secondary-foreground: #ffffff;
+  /* Muted */
+  --muted: #f8f9fa;
+  --muted-foreground: #6c757d;
+  /* Accent — FreshLime */
+  --accent: #87d300;
+  --accent-foreground: #05621e;
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
+  /* Border & Input */
+  --border: oklch(0.88 0.04 142);
+  --input: oklch(0.88 0.04 142);
+  --ring: oklch(0.5 0.19 145);
 
-  --destructive: #A85448;
+  /* Semantic */
+  --warning: #facc15;
+  --warning-foreground: #713f12;
+  --warning-muted: #fef9c3;
 
-  /* Semantic Map overrides */
-  --warning: #C18C5D;
-  --warning-foreground: #FFFFFF;
-  --warning-muted: #F0EBE5;
-
-  --success: #5D7052;
-  --success-foreground: #F3F4F1;
-  --success-muted: #F0EBE5;
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --success-muted: #dcfce7;
 }
 
-/* Define base styles */
-* {
-  border-color: var(--border);
-  outline-color: color-mix(in oklch, var(--ring), transparent 50%);
+/* Layered, as in veris-frontend. Coral declares these defaults outside any
+   layer, where they outrank every utility: `border-primary`, `border-input`
+   and `aria-invalid:border-destructive` all silently lose to --border. */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-/* Base64 Noise Overlay for tactile paper texture */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.035;
-  mix-blend-mode: multiply;
-}
-
-/* Font styles */
+/* Force Montserrat font family */
 html,
 body,
 * {
-  font-family: var(--font-nunito), system-ui, sans-serif;
-}
-
-h1, h2, h3, h4, h5, h6, .font-serif {
-  font-family: var(--font-fraunces), serif;
+  font-family: var(--font-montserrat), system-ui, sans-serif;
 }
 
 @theme {
-  --breakpoint-tablet: 43.75rem; 
+  --breakpoint-tablet: 43.75rem;
 }
 
 /* Custom Fade Animations */
@@ -161,32 +174,6 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   .animate-gentle-rotate {
     animation: gentle-rotate 20s linear infinite;
   }
-  /* Organic Wabi-Sabi Custom shapes */
-  .blob-shape-1 {
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  }
-  .blob-shape-2 {
-    border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%;
-  }
-  .blob-shape-3 {
-    border-radius: 40% 60% 70% 30% / 40% 50% 50% 60%;
-  }
-
-  /* Asymmetric Card Radii */
-  .organic-card-1 { border-radius: 2rem 4rem 2rem 3rem; }
-  .organic-card-2 { border-radius: 3rem 2rem 4rem 2rem; }
-  .organic-card-3 { border-radius: 2rem 3rem 2rem 4rem; }
-  .organic-card-4 { border-radius: 4rem 2rem 3rem 2rem; }
-  .organic-card-5 { border-radius: 3rem 4rem 2rem 2rem; }
-  .organic-card-6 { border-radius: 2rem 2rem 4rem 3rem; }
-
-  /* Soft custom shadows */
-  .shadow-soft {
-    box-shadow: 0 4px 20px -2px rgba(93, 112, 82, 0.15);
-  }
-  .shadow-float {
-    box-shadow: 0 10px 40px -10px rgba(193, 140, 93, 0.2);
-  }
 }
 
 @keyframes fade-in {
@@ -230,11 +217,3 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 .animation-delay-800 { animation-delay: 0.45s; }
 .animation-delay-900 { animation-delay: 0.5s; }
 .animation-delay-1000 { animation-delay: 0.55s; }
-
-/* Custom Font Classes */
-.font-nunito {
-  font-family: var(--font-nunito), system-ui, sans-serif;
-}
-.font-fraunces {
-  font-family: var(--font-fraunces), serif;
-}

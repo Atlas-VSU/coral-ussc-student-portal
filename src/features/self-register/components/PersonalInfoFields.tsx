@@ -7,10 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  lightInputClass,
-  type SelfRegisterFormData,
-} from "../constants";
+import { type SelfRegisterFormData } from "../constants";
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<SelfRegisterFormData>;
@@ -26,14 +23,13 @@ export function PersonalInfoFields({ form, emailReadOnly }: PersonalInfoFieldsPr
         name="studentId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-[#1B5E20] font-semibold">
+            <FormLabel className="text-primary font-semibold">
               Student ID
             </FormLabel>
             <FormControl>
               <Input
                 {...field}
                 placeholder="xx-x-xxxxx"
-                className={lightInputClass}
               />
             </FormControl>
             <FormMessage />
@@ -45,7 +41,7 @@ export function PersonalInfoFields({ form, emailReadOnly }: PersonalInfoFieldsPr
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-[#1B5E20] font-semibold">
+            <FormLabel className="text-primary font-semibold">
               Email
             </FormLabel>
             <FormControl>
@@ -54,9 +50,7 @@ export function PersonalInfoFields({ form, emailReadOnly }: PersonalInfoFieldsPr
                 type="email"
                 placeholder="your_address@gmail.com"
                 readOnly={emailReadOnly}
-                className={`${lightInputClass} ${
-                  emailReadOnly ? "!bg-gray-100 cursor-not-allowed opacity-80" : ""
-                }`}
+                className={emailReadOnly ? "bg-muted cursor-not-allowed opacity-80" : undefined}
               />
             </FormControl>
             <FormMessage />
@@ -68,11 +62,11 @@ export function PersonalInfoFields({ form, emailReadOnly }: PersonalInfoFieldsPr
         name="firstName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-[#1B5E20] font-semibold">
+            <FormLabel className="text-primary font-semibold">
               First Name
             </FormLabel>
             <FormControl>
-              <Input {...field} className={lightInputClass} />
+              <Input {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -83,11 +77,11 @@ export function PersonalInfoFields({ form, emailReadOnly }: PersonalInfoFieldsPr
         name="lastName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-[#1B5E20] font-semibold">
+            <FormLabel className="text-primary font-semibold">
               Last Name
             </FormLabel>
             <FormControl>
-              <Input {...field} className={lightInputClass} />
+              <Input {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

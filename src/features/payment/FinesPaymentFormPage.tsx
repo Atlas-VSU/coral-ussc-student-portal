@@ -382,9 +382,9 @@ export default function FinesPaymentFormPage({
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="mx-auto max-w-2xl px-4 py-8 pb-36 relative z-10">
         <PaymentBrandHeader />
@@ -416,7 +416,7 @@ export default function FinesPaymentFormPage({
         </div>
 
         {isContextualFlow && studentData && organizationData && selectedPaymentItems && (
-          <Card className="mb-6 bg-card border border-border/50 shadow-soft">
+          <Card className="mb-6 bg-card border border-border/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-primary" />
@@ -455,7 +455,7 @@ export default function FinesPaymentFormPage({
               </div>
 
               {/* Payment Breakdown Row */}
-              <div className="space-y-3 rounded-xl border border-border/50 bg-white/50 p-4">
+              <div className="space-y-3 rounded-xl border border-border/50 bg-card p-4">
                 {selectedPaymentItems.feeAmount > 0 && (
                   <div className="flex items-center justify-between text-sm font-medium">
                     <span className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export default function FinesPaymentFormPage({
                 {selectedPaymentItems.fineAmount > 0 && (
                   <div className="flex items-center justify-between text-sm font-medium">
                     <span className="flex items-center gap-2">
-                      <ShieldAlert className="h-4 w-4 text-secondary" />
+                      <ShieldAlert className="h-4 w-4 text-destructive" />
                       Fines ({selectedFineItems.length} item{selectedFineItems.length > 1 ? "s" : ""})
                     </span>
                     <span className="font-bold text-foreground">₱{selectedPaymentItems.fineAmount.toFixed(2)}</span>
@@ -477,7 +477,7 @@ export default function FinesPaymentFormPage({
                 <Separator className="bg-border/50" />
                 <div className="flex items-center justify-between font-bold text-base">
                   <span>Total Due</span>
-                  <span className="text-primary font-serif text-lg">₱{selectedPaymentItems.totalAmount.toFixed(2)}</span>
+                  <span className="text-primary text-lg">₱{selectedPaymentItems.totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>
@@ -489,7 +489,7 @@ export default function FinesPaymentFormPage({
           {/* Section 1 — Student Info */}
           <div>
             <SectionHeading number={1} title="Student Info" />
-            <Card className="border border-border/50 bg-card shadow-soft">
+            <Card className="border border-border/50 bg-card">
               <CardContent className="pt-6 flex flex-col gap-4">
                 <input type="hidden" {...register("userName")} />
                 <input type="hidden" {...register("studentId")} />
@@ -511,7 +511,7 @@ export default function FinesPaymentFormPage({
           <div className="flex flex-col">
             <SectionHeading number={2} title="Payment Details" />
             {isGcash && (
-              <Card className="mt-2 border border-secondary/20 bg-secondary/5 shadow-soft">
+              <Card className="mt-2 border border-secondary/20 bg-secondary/5">
                 <CardContent className="pt-6 flex flex-col items-center gap-6">
                   <p className="text-xs text-muted-foreground self-start flex items-center gap-1.5 font-medium">
                     <CreditCard className="h-4 w-4 text-secondary" />
@@ -519,7 +519,7 @@ export default function FinesPaymentFormPage({
                   </p>
 
                   {/* QR Code Section */}
-                  <div className="border border-border/50 bg-white p-3 rounded-2xl shadow-soft">
+                  <div className="border border-border/50 bg-white p-3 rounded-xl shadow-sm">
                     <img
                       src={organizationData?.orgTreasurerUrl || "/images/public-student-payment/404-QRNOTFOUND.png"}
                       alt={`${treasurerName} GCash Payment QR Code`}
@@ -528,20 +528,20 @@ export default function FinesPaymentFormPage({
                   </div>
 
                   {/* GCash Account Details */}
-                  <div className="w-full bg-white/90 rounded-2xl p-5 border border-border shadow-soft">
+                  <div className="w-full bg-card rounded-xl p-5 border border-border shadow-sm">
                     <h4 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <Phone className="h-4 w-4 text-secondary" />
                       Treasurer GCash Details
                     </h4>
                     <div className="space-y-4">
-                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-lg min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-secondary" />
                           <span className="text-xs md:text-sm text-muted-foreground font-medium">Treasurer Name:</span>
                         </div>
                         <span className="font-bold text-sm md:text-base break-words text-left min-[430px]:text-right text-foreground">{treasurerName}</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-lg min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-secondary" />
                           <span className="text-xs md:text-sm text-muted-foreground font-medium">GCash Number:</span>
@@ -565,21 +565,21 @@ export default function FinesPaymentFormPage({
                           <Button
                             type="button"
                             variant="outline"
-                            className="h-auto w-full whitespace-normal py-3 text-xs leading-snug border-secondary/30 text-secondary hover:bg-secondary/10 sm:text-sm"
+                            className="h-auto w-full whitespace-normal py-3 text-xs leading-snug sm:text-sm"
                           >
                             Use alternative payment account (Auditor)
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="w-[calc(100%-1.5rem)] max-w-md bg-card text-foreground border border-border/50 rounded-[2rem] p-8 shadow-float overflow-hidden">
+                        <DialogContent className="w-[calc(100%-1.5rem)] max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
                           <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold font-serif">Alternative GCash Account</DialogTitle>
+                            <DialogTitle className="text-2xl font-bold">Alternative GCash Account</DialogTitle>
                             <DialogDescription className="text-sm text-muted-foreground font-medium">
                               Use the auditor account only if the treasurer account is unavailable.
                             </DialogDescription>
                           </DialogHeader>
 
                           <div className="space-y-6">
-                            <div className="relative mx-auto max-h-56 w-auto rounded-2xl border border-border bg-white p-3 overflow-hidden shadow-soft flex items-center justify-center">
+                            <div className="relative mx-auto max-h-56 w-auto rounded-xl border border-border bg-white p-3 overflow-hidden shadow-sm flex items-center justify-center">
                               <img
                                 src={organizationData?.orgAuditorUrl || "/images/public-student-payment/404-QRNOTFOUND.png"}
                                 alt={`${auditorName} GCash Payment QR Code`}
@@ -587,7 +587,7 @@ export default function FinesPaymentFormPage({
                               />
                             </div>
 
-                            <div className="rounded-2xl border border-border bg-secondary/5 p-4 space-y-3 shadow-soft">
+                            <div className="rounded-xl border border-border bg-secondary/5 p-4 space-y-3">
                               <div className="flex flex-col gap-1 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between min-[430px]:gap-2">
                                 <span className="text-xs text-muted-foreground font-medium">Auditor Name:</span>
                                 <span className="text-sm font-bold text-foreground break-words text-left min-[430px]:text-right">{auditorName}</span>
@@ -623,7 +623,7 @@ export default function FinesPaymentFormPage({
                     </h4>
 
                     {/* Option 1: QR Code */}
-                    <div className="space-y-2 bg-white/50 border border-border/30 rounded-2xl p-4 shadow-soft">
+                    <div className="space-y-2 bg-card border border-border rounded-xl p-4 shadow-sm">
                       <p className="text-xs font-bold text-primary uppercase tracking-wider">Option 1: Scan QR Code</p>
                       <ol className="space-y-1.5 pl-5 list-decimal text-xs text-muted-foreground font-medium">
                         <li>Open GCash app and tap &quot;Scan QR&quot;</li>
@@ -636,7 +636,7 @@ export default function FinesPaymentFormPage({
                     </div>
 
                     {/* Option 2: Send Money */}
-                    <div className="space-y-2 bg-white/50 border border-border/30 rounded-2xl p-4 shadow-soft">
+                    <div className="space-y-2 bg-card border border-border rounded-xl p-4 shadow-sm">
                       <p className="text-xs font-bold text-primary uppercase tracking-wider">Option 2: Send Money</p>
                       <ol className="space-y-1.5 pl-5 list-decimal text-xs text-muted-foreground font-medium">
                         <li>Open GCash app and tap &quot;Send Money&quot;</li>
@@ -651,10 +651,10 @@ export default function FinesPaymentFormPage({
                   </div>
 
                   {/* Important Reminder */}
-                  <div className="w-full bg-secondary/5 border border-secondary/20 rounded-[1.5rem] p-4 shadow-soft">
+                  <div className="w-full bg-warning-muted border border-warning rounded-lg p-4">
                     <p className="text-xs flex items-start gap-2.5 font-medium leading-relaxed">
                       <span className="text-muted-foreground">
-                        <span className="font-bold text-secondary">Important:</span>{' '}
+                        <span className="font-bold text-warning-foreground">Important:</span>{' '}
                         Save your GCash reference number. Take a screenshot of the confirmation page and send it to our support for faster verification.
                       </span>
                     </p>
@@ -668,7 +668,7 @@ export default function FinesPaymentFormPage({
                 </CardContent>
               </Card>
             )}
-            <Card className="border border-border/50 bg-card shadow-soft mt-4">
+            <Card className="border border-border/50 bg-card mt-4">
               <CardContent className="pt-6 flex flex-col gap-4">
                 <input type="hidden" {...register("amount", { valueAsNumber: true })} />
                 <div className="rounded-xl border border-border bg-primary/5 px-4 py-3">
@@ -688,14 +688,14 @@ export default function FinesPaymentFormPage({
                 {needsRef && (
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-2">
                     <div className="flex flex-col gap-2">
-                      <Label htmlFor="referenceNumber" className="text-foreground font-bold text-sm">Reference Number <span className="text-primary">*</span></Label>
+                      <Label htmlFor="referenceNumber" className="text-primary font-semibold text-sm">Reference Number <span className="text-primary">*</span></Label>
                       <Input id="referenceNumber" placeholder="e.g. 1234567890" {...register("referenceNumber")}
                         className={errors.referenceNumber ? "border-destructive focus-visible:ring-destructive/30" : ""} />
                       {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
                     </div>
                     {isGcash && (
                       <div className="flex flex-col gap-2">
-                        <Label htmlFor="senderNumber" className="text-foreground font-bold text-sm">Sender Number <span className="text-primary">*</span></Label>
+                        <Label htmlFor="senderNumber" className="text-primary font-semibold text-sm">Sender Number <span className="text-primary">*</span></Label>
                         <Input id="senderNumber" placeholder="09XXXXXXXXX" {...register("senderNumber")}
                           className={errors.senderNumber ? "border-destructive focus-visible:ring-destructive/30" : ""} />
                         {errors.senderNumber ? <FieldError message={errors.senderNumber.message!} /> : <p className="text-xs text-muted-foreground font-medium px-2">Must be a valid PH number</p>}
@@ -711,7 +711,7 @@ export default function FinesPaymentFormPage({
           {/* Section 3 — Upload Receipt */}
           <div>
             <SectionHeading number={3} title="Upload Receipt" />
-            <Card className="border border-border/50 bg-card shadow-soft">
+            <Card className="border border-border/50 bg-card">
               <CardContent className="pt-6">
                 <ImageUpload
                   value={image}
@@ -731,15 +731,15 @@ export default function FinesPaymentFormPage({
           {/* Section 4 — Notes */}
           <div>
             <SectionHeading number={4} title="Notes" optional />
-            <Card className="border border-border/50 bg-card shadow-soft">
+            <Card className="border border-border/50 bg-card">
               <CardContent className="pt-6">
-                <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} className="rounded-2xl border-border bg-white/50 focus-visible:ring-primary/30 p-4" />
+                <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} />
               </CardContent>
             </Card>
           </div>
 
           {submitError && (
-            <Alert variant="destructive" className="rounded-2xl border border-destructive/20 bg-destructive/10">
+            <Alert variant="destructive" className="border border-destructive/20 bg-destructive/10">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-xs font-semibold">{submitError}</AlertDescription>
             </Alert>
@@ -747,12 +747,12 @@ export default function FinesPaymentFormPage({
 
           {/* Bottom Floating Bar */}
           <div
-            className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-[#FDFCF8]/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-float"
+            className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-background/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-lg"
             style={{ bottom: keyboardOffset > 0 ? `${keyboardOffset}px` : 0 }}
           >
             <div className="mx-auto max-w-2xl">
               {status === "submitting" ? (
-                <div className="w-full rounded-full bg-primary text-primary-foreground px-6 py-3 flex items-center justify-center gap-2 font-bold shadow-soft">
+                <div className="w-full rounded-md bg-primary text-primary-foreground px-6 py-3 flex items-center justify-center gap-2 font-bold shadow-xs">
                   <Loader2 className="size-5 animate-spin" />
                   Submitting payment…
                 </div>
@@ -763,7 +763,7 @@ export default function FinesPaymentFormPage({
                     {isContextualFlow && (
                       <p className="text-[11px] text-muted-foreground font-medium">Includes {feeCount} fees + {fineCount} fines</p>
                     )}
-                    <p className="text-2xl font-bold font-serif text-primary">₱{mobileTotal.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-primary">₱{mobileTotal.toFixed(2)}</p>
                   </div>
                   <Button
                     type="submit"
@@ -803,7 +803,7 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-3 flex items-center gap-2.5">
-      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-soft">
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
         {number}
       </span>
       <p className="text-sm font-bold text-foreground">

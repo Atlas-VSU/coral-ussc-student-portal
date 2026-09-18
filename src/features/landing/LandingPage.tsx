@@ -28,31 +28,19 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[30rem] h-[30rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[35rem] h-[35rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+    <div className="min-h-screen bg-linear-to-b lg:bg-linear-to-br from-white from-30% to-brand-meadow text-foreground flex flex-col relative overflow-hidden font-sans">
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[30rem] h-[30rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[35rem] h-[35rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
-      {/* Header - Sticky Floating Pill Navbar */}
-      <header className="sticky top-4 z-40 max-w-5xl w-[calc(100%-2rem)] mx-auto bg-white/70 backdrop-blur-md border border-border/50 shadow-soft px-6 py-3 rounded-full flex items-center justify-between transition-all duration-300 mt-4">
+      {/* Header - Sticky Floating Navbar */}
+      <header className="sticky top-4 z-40 max-w-5xl w-[calc(100%-2rem)] mx-auto bg-card/80 backdrop-blur-md border border-border/50 shadow-sm px-6 py-3 rounded-xl flex items-center justify-between transition-all duration-300 mt-4">
         <div className="flex items-center gap-3">
-          {/* Logo: Circular moss green container with white icon */}
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary p-2 border border-border/10 shadow-sm text-primary-foreground">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <path d="M4 4l8 16 8-16M8 4l4 8 4-8" />
-            </svg>
-          </div>
+          {/* Logo */}
+          <Image src="/images/ussc-logo-1.webp" alt="USSC Connect" width={40} height={40} className="size-10 shrink-0 object-contain" priority />
           <div className="flex flex-col">
-            <span className="text-lg font-bold font-serif leading-none tracking-wide text-foreground">
-              VERIS
+            <span className="text-lg font-bold leading-none tracking-wide text-brand-ink">
+              USSC Connect
             </span>
             <span className="mt-1 inline-flex w-fit items-center rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary">
               Student Portal
@@ -61,16 +49,16 @@ export default function LandingPage() {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-primary">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-brand-green">
           <button
             onClick={() => setSelfRegisterOpen(true)}
-            className="hover:text-secondary transition-colors cursor-pointer"
+            className="hover:text-brand-ink transition-colors cursor-pointer"
           >
             Self-Register
           </button>
           <button
             onClick={() => setUpdateInfoOpen(true)}
-            className="hover:text-secondary transition-colors cursor-pointer"
+            className="hover:text-brand-ink transition-colors cursor-pointer"
           >
             Update Record
           </button>
@@ -78,6 +66,7 @@ export default function LandingPage() {
             onClick={handleMakePayment}
             variant="secondary"
             size="sm"
+            className="bg-linear-to-r from-brand-leaf to-brand-green text-white hover:brightness-105"
           >
             Pay Dues
           </Button>
@@ -93,15 +82,15 @@ export default function LandingPage() {
         </button>
       </header>
 
-      {/* Mobile Menu - Dropdown with organic rounded borders */}
+      {/* Mobile Menu - Dropdown */}
       {mobileMenuOpen && (
-        <div className="absolute top-24 left-4 right-4 z-40 bg-white/95 backdrop-blur-md border border-border/50 p-6 space-y-4 flex flex-col shadow-float rounded-[2rem] animate-fade-in">
+        <div className="absolute top-24 left-4 right-4 z-40 bg-popover/95 backdrop-blur-md border border-border/50 p-6 space-y-4 flex flex-col shadow-lg rounded-xl animate-fade-in">
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               setSelfRegisterOpen(true);
             }}
-            className="text-left py-2 font-bold text-primary hover:text-secondary transition-colors cursor-pointer"
+            className="text-left py-2 font-bold text-brand-green hover:text-brand-ink transition-colors cursor-pointer"
           >
             Self-Register
           </button>
@@ -110,7 +99,7 @@ export default function LandingPage() {
               setMobileMenuOpen(false);
               setUpdateInfoOpen(true);
             }}
-            className="text-left py-2 font-bold text-primary hover:text-secondary transition-colors cursor-pointer"
+            className="text-left py-2 font-bold text-brand-green hover:text-brand-ink transition-colors cursor-pointer"
           >
             Update Record
           </button>
@@ -120,7 +109,7 @@ export default function LandingPage() {
               handleMakePayment();
             }}
             variant="secondary"
-            className="w-full"
+            className="w-full bg-linear-to-r from-brand-leaf to-brand-green text-white hover:brightness-105"
           >
             Pay Dues
           </Button>
@@ -130,37 +119,33 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="flex-1 flex flex-col justify-center items-center px-4 py-16 md:py-24 max-w-6xl mx-auto w-full text-center relative z-10">
         <div className="max-w-4xl space-y-8 animate-fade-in-up">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold tracking-wider text-primary uppercase">
-            <Globe className="size-3.5" />
-            University Student Services Coalition
-          </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black font-serif text-foreground leading-[1.1] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-brand-ink leading-[1.1] tracking-tight">
             Real-Time Eligibility.{" "}
-            <span className="text-primary font-serif block">
+            <span className="block">
               Effortless Settlement.
             </span>{" "}
-            <span className="text-secondary font-serif block">
+            <span className="block">
               Total Clarity.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto font-medium">
+          <p className="text-base sm:text-lg text-brand-ink leading-relaxed max-w-2xl mx-auto font-medium">
             Streamline your semestral clearance process by tracking your organizational fees and fines, settle payments online, and monitor your clearance status in real-time.
           </p>
         </div>
 
-        {/* Portal Feature Cards - Asymmetric Card Radii with micro-rotations */}
+        {/* Portal Feature Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-16 md:mt-24 text-left">
           {/* Card 1 — Self-Registration */}
           <div
             onClick={() => setSelfRegisterOpen(true)}
-            className="bg-card border border-border/50 organic-card-1 p-8 shadow-soft hover:-translate-y-2 hover:rotate-1 hover:shadow-float cursor-pointer transition-all duration-500 flex flex-col h-full group"
+            className="bg-card border border-border/50 rounded-xl p-8 shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition-all duration-500 flex flex-col h-full group"
           >
-            <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground">
+            <div className="size-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground">
               <GraduationCap className="size-7" />
             </div>
-            <h3 className="text-2xl font-bold font-serif text-foreground mb-3">Student Self-Registration</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-3">Student Self-Registration</h3>
             <p className="text-sm text-muted-foreground mb-8 flex-1 leading-relaxed">
               New students can easily register for organization membership online by verifying their email address.
             </p>
@@ -172,12 +157,12 @@ export default function LandingPage() {
           {/* Card 2 — Update Record */}
           <div
             onClick={() => setUpdateInfoOpen(true)}
-            className="bg-card border border-border/50 organic-card-2 p-8 shadow-soft hover:-translate-y-2 hover:-rotate-1 hover:shadow-float cursor-pointer transition-all duration-500 flex flex-col h-full group"
+            className="bg-card border border-border/50 rounded-xl p-8 shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition-all duration-500 flex flex-col h-full group"
           >
-            <div className="size-14 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-secondary group-hover:text-secondary-foreground">
+            <div className="size-14 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-secondary group-hover:text-secondary-foreground">
               <Pencil className="size-7" />
             </div>
-            <h3 className="text-2xl font-bold font-serif text-foreground mb-3">Update Student Record</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-3">Update Student Record</h3>
             <p className="text-sm text-muted-foreground mb-8 flex-1 leading-relaxed">
               Ensure your student information is accurate and up-to-date in order to receive correct clearance status.
             </p>
@@ -189,12 +174,12 @@ export default function LandingPage() {
           {/* Card 3 — Pay Dues */}
           <div
             onClick={handleMakePayment}
-            className="bg-card border border-border/50 organic-card-3 p-8 shadow-soft hover:-translate-y-2 hover:rotate-1 hover:shadow-float cursor-pointer transition-all duration-500 flex flex-col h-full group sm:col-span-2 lg:col-span-1"
+            className="bg-card border border-border/50 rounded-xl p-8 shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition-all duration-500 flex flex-col h-full group sm:col-span-2 lg:col-span-1"
           >
-            <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground">
+            <div className="size-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground">
               <CreditCard className="size-7" />
             </div>
-            <h3 className="text-2xl font-bold font-serif text-foreground mb-3">Pay Dues &amp; Fines</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-3">Pay Dues &amp; Fines</h3>
             <p className="text-sm text-muted-foreground mb-8 flex-1 leading-relaxed">
               Verify your enrollment, review academic term dues or attendance fines, and securely submit GCash receipts.
             </p>
@@ -204,21 +189,6 @@ export default function LandingPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border bg-card/50 py-10 px-4 sm:px-6 lg:px-8 mt-16 relative z-10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-muted-foreground font-medium select-none">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="size-5 text-primary" />
-            <span>&copy; {new Date().getFullYear()} VERIS. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-6 text-muted-foreground">
-            <span className="hover:text-foreground transition-colors cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-foreground transition-colors cursor-pointer">Terms of Service</span>
-            <span className="hover:text-foreground transition-colors cursor-pointer">Support Helpdesk</span>
-          </div>
-        </div>
-      </footer>
 
       {/* Dialog Modals */}
       <SelfRegisterDialog isOpen={selfRegisterOpen} onOpenChange={setSelfRegisterOpen} />

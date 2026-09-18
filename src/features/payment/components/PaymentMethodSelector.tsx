@@ -23,15 +23,15 @@ export function PaymentMethodSelector({ value, error, onSelect }: PaymentMethodS
             className={cn(
               "flex flex-1 flex-col items-center gap-1.5 rounded-lg border-2 px-3 py-3 text-center transition-all cursor-pointer",
               value === method.value
-                ? "border-green-500 bg-green-50"
-                : "border-border bg-card hover:border-green-300 hover:bg-green-50/50"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
             )}
           >
             <span className="text-xl">{method.icon}</span>
             <span className={cn(
               "text-xs font-700",
               value === method.value
-                ? "text-green-700 font-bold"
+                ? "text-primary font-bold"
                 : "text-foreground font-semibold"
             )}>
               {method.label}

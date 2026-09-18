@@ -8,7 +8,7 @@ interface ConsentSectionProps {
 
 export function ConsentSection({ agreed, setAgreed }: ConsentSectionProps) {
     return (
-        <div className="bg-primary/5 p-5 rounded-[1.5rem] border border-primary/20">
+        <div className="bg-primary/5 p-5 rounded-lg border border-primary/20">
             <div className="flex items-start gap-3">
                 <Checkbox
                     id="terms"
@@ -16,7 +16,7 @@ export function ConsentSection({ agreed, setAgreed }: ConsentSectionProps) {
                     onCheckedChange={(checked: boolean) =>
                         setAgreed(checked === true)
                     }
-                    className="mt-0.5 rounded-md border-border bg-white data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus-visible:ring-primary/30"
+                    className="mt-0.5"
                 />
                 <div>
                     <Label

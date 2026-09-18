@@ -1,23 +1,17 @@
-import { Fraunces, Nunito } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Coral-USSC's only type family, loaded with the same weights Coral uses.
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-});
-
-const nunito = Nunito({
-  variable: "--font-nunito",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata = {
-  title: "VERIS Student Portal",
+  title: "USSC Connect Student Portal",
   description: "Student self-service portal for registration, record updates, and payments",
-  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({
@@ -31,7 +25,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#2E7D32" />
       </head>
       <body
-        className={`${fraunces.variable} ${nunito.variable} antialiased`}
+        className={`${montserrat.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}

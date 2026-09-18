@@ -33,10 +33,10 @@ export function ConfirmationModal({
 }: ConfirmationModalProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-card">
         <DialogHeader>
-          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          <div className="mx-auto w-12 h-12 bg-success-muted rounded-full flex items-center justify-center mb-2">
+            <CheckCircle2 className="w-6 h-6 text-success" />
           </div>
           <DialogTitle className="text-center">Confirm Your Information</DialogTitle>
           <DialogDescription className="text-center">
@@ -96,8 +96,9 @@ export function ConfirmationModal({
           </Button>
           <Button
             type="button"
+            variant="success"
             onClick={onConfirm}
-            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold"
+            className="w-full sm:w-auto font-semibold"
           >
             Confirm & Continue
           </Button>

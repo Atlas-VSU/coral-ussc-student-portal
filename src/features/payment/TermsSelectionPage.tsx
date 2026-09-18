@@ -108,9 +108,9 @@ export default function TermsSelectionPage({
 
   return (
     <div className="min-h-screen bg-background py-8 px-4 relative overflow-hidden font-sans">
-      {/* Background Organic Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none blob-shape-1 animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none blob-shape-2 animate-float-delayed" />
+      {/* Background Blurred Blobs */}
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
@@ -128,7 +128,7 @@ export default function TermsSelectionPage({
         </Button>
 
         {/* Student Info Banner Card */}
-        <Card className="border-border bg-primary/5 shadow-soft">
+        <Card className="border-border bg-primary/5">
           <CardContent className="px-4 sm:px-6 py-4">
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
@@ -152,9 +152,9 @@ export default function TermsSelectionPage({
         </Card>
 
         {/* Term Selection Card */}
-        <Card className="bg-card border border-border/50 shadow-soft">
+        <Card className="bg-card border border-border/50">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-bold font-serif">Select Academic Term</CardTitle>
+            <CardTitle className="text-2xl font-bold">Select Academic Term</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Choose the term to view and settle your outstanding dues
             </CardDescription>
@@ -176,11 +176,11 @@ export default function TermsSelectionPage({
             ) : (
               <div className="space-y-4">
                 {notEnrolledInCurrentTerm && (
-                  <div className="rounded-[1.25rem] border border-amber-300 bg-amber-50 px-4 py-3">
-                    <p className="text-sm font-bold text-amber-800">
+                  <div className="rounded-lg border border-warning bg-warning-muted px-4 py-3">
+                    <p className="text-sm font-bold text-warning-foreground">
                       You are not enrolled for the current term
                     </p>
-                    <p className="text-xs text-amber-700 font-medium mt-0.5">
+                    <p className="text-xs text-warning-foreground font-medium mt-0.5">
                       {openableTerms.length > 0
                         ? "Your earlier terms are listed below. They are view only — you can review your records and payments, but no new payment can be made against them."
                         : "We could not find any records for you in the terms listed. Please contact your organization."}
@@ -197,12 +197,12 @@ export default function TermsSelectionPage({
                     onClick={() => selectable && setSelectedTermId(term.id)}
                     disabled={!selectable}
                     aria-disabled={!selectable}
-                    className={`w-full text-left p-4 rounded-[1.5rem] border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none ${
+                    className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
                       !selectable
                         ? "border-border bg-muted/30 opacity-70 cursor-not-allowed"
                         : selectedTermId === term.id
-                          ? "border-primary bg-primary/5 shadow-soft cursor-pointer hover:border-primary/50 hover:bg-primary/5"
-                          : "border-border bg-white/50 cursor-pointer hover:border-primary/50 hover:bg-primary/5"
+                          ? "border-primary bg-primary/5 shadow-sm cursor-pointer hover:border-primary/50 hover:bg-primary/5"
+                          : "border-border bg-card cursor-pointer hover:border-primary/50 hover:bg-primary/5"
                     }`}
                   >
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -221,7 +221,7 @@ export default function TermsSelectionPage({
                           )}
                         </div>
                         {!selectable ? (
-                          <p className="text-xs font-medium text-amber-700">
+                          <p className="text-xs font-medium text-warning-foreground">
                             {term.isActive
                               ? "You are not enrolled for this term"
                               : "No records for this term"}

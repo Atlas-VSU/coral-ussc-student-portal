@@ -14,9 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  lightSelectTriggerClass,
-  lightSelectContentClass,
-  lightSelectItemClass,
   type ProgramOption,
   type SelfRegisterFormData,
 } from "../constants";
@@ -41,7 +38,7 @@ export function ProgramSelectField({
       name="programId"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-[#1B5E20] font-semibold">
+          <FormLabel className="text-primary font-semibold">
             Program
           </FormLabel>
           <Select
@@ -50,7 +47,7 @@ export function ProgramSelectField({
             disabled={isLoadingPrograms}
           >
             <FormControl>
-              <SelectTrigger className={lightSelectTriggerClass}>
+              <SelectTrigger className="w-full truncate">
                 <SelectValue
                   placeholder={
                     isLoadingPrograms
@@ -60,12 +57,11 @@ export function ProgramSelectField({
                 />
               </SelectTrigger>
             </FormControl>
-            <SelectContent className={lightSelectContentClass}>
+            <SelectContent>
               {programOptions.map((program) => (
                 <SelectItem
                   key={program.value}
                   value={program.value}
-                  className={lightSelectItemClass}
                 >
                   {program.label}
                 </SelectItem>
@@ -73,7 +69,7 @@ export function ProgramSelectField({
             </SelectContent>
           </Select>
           {programLoadError && (
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-warning-foreground">
               {programLoadError}
             </p>
           )}

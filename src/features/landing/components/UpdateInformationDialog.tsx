@@ -176,14 +176,14 @@ export function UpdateInformationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 rounded-[2rem] p-8 shadow-float overflow-hidden">
+      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
         {step === "verify" && (
           <>
             <DialogHeader className="items-center text-center">
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <Search className="w-7 h-7 text-primary" />
               </div>
-              <DialogTitle className="text-2xl font-bold font-serif text-foreground">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 Verify Your Identity
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm max-w-sm">
@@ -193,7 +193,7 @@ export function UpdateInformationDialog({
 
             <form onSubmit={handleSubmit(onVerifySubmit)} className="space-y-5 mt-6">
               <div className="space-y-2">
-                <Label className="text-foreground font-bold text-sm">Student ID</Label>
+                <Label className="text-primary font-semibold text-sm">Student ID</Label>
                 <Input
                   {...register("studentId")}
                   placeholder="25-1-12345"
@@ -207,29 +207,29 @@ export function UpdateInformationDialog({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-foreground font-bold text-sm">Program</Label>
+                <Label className="text-primary font-semibold text-sm">Program</Label>
                 <Select
                   disabled={isLoadingPrograms || isVerifying}
                   value={programValue}
                   onValueChange={(val) => { setValue("programId", val, { shouldValidate: true }); clearErrors("programId"); }}
                 >
-                  <SelectTrigger className={`w-full !bg-white/50 !text-foreground !border-border hover:bg-accent/10 focus-visible:!ring-primary/30 focus-visible:!ring-offset-2 truncate rounded-full h-12 px-6 ${errors.programId ? "border-destructive" : ""}`}>
+                  <SelectTrigger className={`w-full truncate ${errors.programId ? "border-destructive" : ""}`}>
                     <SelectValue placeholder={isLoadingPrograms ? "Loading programs…" : "Select your program"} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card text-foreground border-border rounded-xl">
+                  <SelectContent>
                     {programs.map((p) => (
-                      <SelectItem key={p.value} value={p.value} className="text-foreground focus:bg-primary/10 focus:text-foreground">
+                      <SelectItem key={p.value} value={p.value}>
                         {p.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {programLoadError && <p className="text-xs text-amber-600">{programLoadError}</p>}
+                {programLoadError && <p className="text-xs text-warning-foreground">{programLoadError}</p>}
                 {errors.programId && <p className="text-xs text-destructive">{errors.programId.message}</p>}
               </div>
 
               {verifyError && (
-                <p className="text-sm text-destructive rounded-[1rem] bg-destructive/10 border border-destructive/20 px-4 py-3 font-medium">
+                <p className="text-sm text-destructive rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 font-medium">
                   {verifyError}
                 </p>
               )}
@@ -252,7 +252,7 @@ export function UpdateInformationDialog({
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <UserCheck className="w-7 h-7 text-primary" />
               </div>
-              <DialogTitle className="text-2xl font-bold font-serif text-foreground">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 Identity Verified
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm max-w-sm">
@@ -288,7 +288,7 @@ export function UpdateInformationDialog({
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <CheckCircle className="w-7 h-7 text-primary" />
               </div>
-              <DialogTitle className="text-2xl font-bold font-serif text-foreground">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 Update Link Sent
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm max-w-sm">
