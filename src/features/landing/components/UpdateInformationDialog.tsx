@@ -30,16 +30,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
-interface UpdateInformationDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-interface ProgramOption {
-  value: string;
-  label: string;
-}
+import { UpdateInformationDialogProps, ProgramOption, UpdateInfoStep } from "../types";
 
 const FALLBACK_PROGRAMS: ProgramOption[] = [
   { value: "bscs", label: "Bachelor of Science in Computer Science" },
@@ -56,13 +47,13 @@ const verifySchema = z.object({
 
 type VerifyFormData = z.infer<typeof verifySchema>;
 
-type Step = "verify" | "email" | "sent";
+
 
 export function UpdateInformationDialog({
   isOpen,
   onOpenChange,
 }: UpdateInformationDialogProps) {
-  const [step, setStep] = useState<Step>("verify");
+  const [step, setStep] = useState<UpdateInfoStep>("verify");
   const [programs, setPrograms] = useState<ProgramOption[]>(FALLBACK_PROGRAMS);
   const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
   const [programLoadError, setProgramLoadError] = useState<string | null>(null);
@@ -176,17 +167,21 @@ export function UpdateInformationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
+      <DialogContent className="max-w-md bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-8 overflow-hidden">
+        {/* Top-left corner accent */}
+        <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green" />
+        <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green" />
+
         {step === "verify" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <Search className="w-7 h-7 text-primary" />
+            <DialogHeader className="items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 mx-auto border border-brand-green/10">
+                <Search className="w-8 h-8 text-brand-green" />
               </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Verify Your Identity
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm max-w-sm">
+              <DialogDescription className="text-muted-foreground text-sm max-w-sm text-center text-brand-green">
                 Enter your Student ID and program to confirm your identity before updating your record.
               </DialogDescription>
             </DialogHeader>
@@ -235,7 +230,7 @@ export function UpdateInformationDialog({
               )}
 
               <div className="flex flex-col gap-3 pt-3">
-                <Button type="submit" disabled={isVerifying} className="w-full">
+                <Button type="submit" disabled={isVerifying} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105">
                   {isVerifying ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />Verifying…</>) : "Verify Identity"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isVerifying} className="w-full">
@@ -248,14 +243,14 @@ export function UpdateInformationDialog({
 
         {step === "email" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <UserCheck className="w-7 h-7 text-primary" />
+            <DialogHeader className="items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 mx-auto border border-brand-green/10">
+                <UserCheck className="w-8 h-8 text-brand-green" />
               </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Identity Verified
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm max-w-sm">
+              <DialogDescription className="text-muted-foreground text-sm max-w-sm text-justify">
                 {verifiedStudentName ? `Welcome, ${verifiedStudentName}. ` : ""}
                 Please confirm to send the verification link.
               </DialogDescription>
@@ -284,11 +279,11 @@ export function UpdateInformationDialog({
 
         {step === "sent" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <CheckCircle className="w-7 h-7 text-primary" />
+            <DialogHeader className="items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 mx-auto border border-brand-green/10">
+                <CheckCircle className="w-8 h-8 text-brand-green" />
               </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Update Link Sent
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm max-w-sm">
@@ -302,7 +297,7 @@ export function UpdateInformationDialog({
               <p className="text-xs text-center text-muted-foreground">
                 If you didn&apos;t receive the email, please check your spam folder or try again in a few minutes.
               </p>
-              <Button onClick={() => handleOpenChange(false)} className="w-full">
+              <Button onClick={() => handleOpenChange(false)} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105">
                 Close
               </Button>
             </div>
