@@ -24,7 +24,7 @@ export function PaymentProgressBar({ currentStep, subtitle }: PaymentProgressBar
               {index < steps.length - 1 && (
                 <div
                   className={`absolute top-4 left-1/2 h-0.5 w-full ${
-                    isCompleted ? "bg-primary" : "bg-border/60"
+                    isCompleted ? "bg-brand-green" : "bg-border/60"
                   }`}
                 />
               )}
@@ -33,7 +33,7 @@ export function PaymentProgressBar({ currentStep, subtitle }: PaymentProgressBar
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
                     isCompleted || isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "bg-linear-to-r from-brand-leaf to-brand-green text-white shadow-sm"
                       : "bg-muted text-muted-foreground border border-border"
                   }`}
                 >

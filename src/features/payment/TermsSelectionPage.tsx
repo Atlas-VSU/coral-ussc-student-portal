@@ -109,8 +109,8 @@ export default function TermsSelectionPage({
   return (
     <div className="min-h-screen bg-background py-8 px-4 relative overflow-hidden font-sans">
       {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-brand-leaf/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-brand-green/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
@@ -128,11 +128,11 @@ export default function TermsSelectionPage({
         </Button>
 
         {/* Student Info Banner Card */}
-        <Card className="border-border bg-primary/5">
-          <CardContent className="px-4 sm:px-6 py-4">
+        <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+          <CardContent className="px-4 sm:px-6 py-4 relative z-10">
             <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <UserCircle className="h-6 w-6 text-primary" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
+                <UserCircle className="h-6 w-6 text-brand-green" />
               </div>
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="font-bold text-lg leading-tight truncate text-foreground">{studentData.name}</p>
@@ -152,17 +152,21 @@ export default function TermsSelectionPage({
         </Card>
 
         {/* Term Selection Card */}
-        <Card className="bg-card border border-border/50">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-bold">Select Academic Term</CardTitle>
+        <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-6">
+          {/* Top-left corner accent */}
+          <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          
+          <CardHeader className="pb-4 relative z-10 pt-8">
+            <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Select Academic Term</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Choose the term to view and settle your outstanding dues
             </CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pt-4">
             {isLoading ? (
-              <div className="py-12 text-center text-muted-foreground text-sm flex items-center justify-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <div className="py-12 text-center text-muted-foreground text-sm flex items-center justify-center gap-2 relative z-10">
+                <Loader2 className="h-5 w-5 animate-spin text-brand-green" />
                 Loading available terms...
               </div>
             ) : error ? (
@@ -201,13 +205,13 @@ export default function TermsSelectionPage({
                       !selectable
                         ? "border-border bg-muted/30 opacity-70 cursor-not-allowed"
                         : selectedTermId === term.id
-                          ? "border-primary bg-primary/5 shadow-sm cursor-pointer hover:border-primary/50 hover:bg-primary/5"
-                          : "border-border bg-card cursor-pointer hover:border-primary/50 hover:bg-primary/5"
+                          ? "border-brand-green bg-brand-green/5 shadow-sm cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
+                          : "border-border bg-white cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
                     }`}
                   >
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-primary/10" : "bg-muted"}`}>
-                        <CalendarDays className={`h-5 w-5 ${selectable ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-brand-green/10" : "bg-muted"}`}>
+                        <CalendarDays className={`h-5 w-5 ${selectable ? "text-brand-green" : "text-muted-foreground"}`} />
                       </div>
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex flex-col min-[450px]:flex-row min-[450px]:items-center gap-1 sm:gap-2">
@@ -215,7 +219,7 @@ export default function TermsSelectionPage({
                             {term.displayName}
                           </p>
                           {term.isActive && (
-                            <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary uppercase">
+                            <span className="inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[11px] font-bold text-brand-green uppercase">
                               Current Term
                             </span>
                           )}
@@ -236,7 +240,7 @@ export default function TermsSelectionPage({
                     {selectable && (
                       <ChevronRight
                         className={`h-5 w-5 shrink-0 transition-transform duration-300 ${
-                          selectedTermId === term.id ? "text-primary translate-x-0.5" : "text-muted-foreground"
+                          selectedTermId === term.id ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
                         }`}
                       />
                     )}
@@ -248,12 +252,11 @@ export default function TermsSelectionPage({
           </CardContent>
         </Card>
 
-        {/* Continue Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-4">
           <Button
             onClick={handleContinue}
             disabled={!selectedTermId || isLoading || isAdvancing}
-            className="w-full min-[400px]:w-auto gap-2"
+            className="w-full min-[400px]:w-auto gap-2 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
           >
             {isAdvancing ? (
               <>

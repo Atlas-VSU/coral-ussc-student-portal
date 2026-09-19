@@ -186,8 +186,8 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-brand-leaf/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-brand-green/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="relative z-10 w-full max-w-md flex flex-col items-center">
         <PaymentBrandHeader stepLabel="Enter your student information to continue" />
@@ -198,8 +198,12 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
           />
         </div>
         
-        <Card className="w-full bg-card border border-border/50 p-0">
-          <CardContent className="px-4 sm:px-6 py-8">
+        <Card className="w-full bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+          {/* Top-left corner accent */}
+          <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          
+          <CardContent className="px-4 sm:px-6 py-8 relative z-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Student ID Input */}
               <div className="space-y-2">
@@ -262,7 +266,7 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
               )}
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isVerifying}>
+              <Button type="submit" className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white" disabled={isVerifying}>
                 {isVerifying ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

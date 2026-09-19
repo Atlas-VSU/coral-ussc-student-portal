@@ -12,10 +12,10 @@ export function PaymentBrandHeader({ stepLabel }: PaymentBrandHeaderProps) {
         {/* Logo */}
         <Image src="/images/ussc-logo-1.webp" alt="USSC Connect" width={40} height={40} className="size-10 shrink-0 object-contain" priority />
         <div className="flex flex-col">
-          <span className="text-lg font-bold leading-none tracking-wide text-brand-ink">
-            USSC Connect
+          <span className="text-lg font-extrabold leading-none tracking-wide bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">
+            USSC CONNECT
           </span>
-          <span className="mt-1 inline-flex w-fit items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-widest text-primary">
+          <span className="mt-1 inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-widest text-brand-green">
             Payment Portal
           </span>
         </div>

@@ -224,8 +224,8 @@ export default function FinesFeesSelectionPage({
   return (
     <div className="min-h-screen bg-background py-8 pb-36 px-4 relative overflow-hidden font-sans">
       {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
+      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-brand-leaf/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-brand-green/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
 
       <div className="max-w-5xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
@@ -240,14 +240,14 @@ export default function FinesFeesSelectionPage({
         </Button>
 
         {/* Term, Student & Organization Info Banner Card */}
-        <Card className="border-border bg-primary/5">
-          <CardContent className="px-4 sm:px-6 py-5 space-y-4">
+        <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+          <CardContent className="px-4 sm:px-6 py-5 space-y-4 relative z-10">
             {/* Term Row */}
             {selectedTerm && (
               <>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <CalendarDays className="h-6 w-6 text-primary" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
+                    <CalendarDays className="h-6 w-6 text-brand-green" />
                   </div>
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <p className="font-bold text-base leading-tight truncate text-foreground">
@@ -262,8 +262,8 @@ export default function FinesFeesSelectionPage({
 
             {/* Student row */}
             <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <UserCircle className="h-6 w-6 text-primary" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
+                <UserCircle className="h-6 w-6 text-brand-green" />
               </div>
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="font-bold text-lg leading-tight truncate text-foreground">{studentData.name}</p>
@@ -284,8 +284,8 @@ export default function FinesFeesSelectionPage({
             
             {/* Organization row */}
             <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <Building2 className="h-6 w-6 text-primary" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
+                <Building2 className="h-6 w-6 text-brand-green" />
               </div>
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="font-bold text-base leading-tight text-foreground">{organizationData.acronym}</p>
@@ -312,29 +312,29 @@ export default function FinesFeesSelectionPage({
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Fees Section */}
-          <Card className="h-fit bg-card border border-border/50">
-            <CardHeader className="pb-4">
+          <Card className="h-fit bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+            <CardHeader className="pb-4 relative z-10 pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Receipt className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-xl font-bold">Organization Fees</CardTitle>
+                  <Receipt className="h-5 w-5 text-brand-green" />
+                  <CardTitle className="text-xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Organization Fees</CardTitle>
                 </div>
-                <Badge variant="outline" className="text-primary rounded-full font-bold">
+                <Badge variant="outline" className="text-brand-green border-brand-green/30 rounded-full font-bold">
                   ₱{feesTotal.toFixed(2)}
                 </Badge>
               </div>
               <CardDescription className="text-sm text-muted-foreground">All fees for your organization this semester</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 relative z-10">
               {/* Pay All Fees Toggle */}
               {fees.length > 0 && (
                 <>
                   <div
                     className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
                       allFeesSelected
-                        ? "bg-primary/10 border-primary shadow-sm"
+                        ? "bg-brand-green/10 border-brand-green shadow-sm"
                         : hasPayableFees
-                          ? "bg-card border-border hover:bg-primary/5 cursor-pointer"
+                          ? "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
                           : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
                     }`}
                     onClick={() => {
@@ -361,7 +361,7 @@ export default function FinesFeesSelectionPage({
                         </span>
                       )}
                     </span>
-                    <span className="text-lg font-bold text-primary shrink-0 tabular-nums">
+                    <span className="text-lg font-bold text-brand-green shrink-0 tabular-nums">
                       ₱{feesPayableTotal.toFixed(2)}
                     </span>
                   </div>
@@ -400,8 +400,8 @@ export default function FinesFeesSelectionPage({
                       !isSelectable
                         ? "bg-muted/40 border-border/50"
                         : isSelected
-                          ? "bg-primary/10 border-primary cursor-pointer"
-                          : "bg-card border-border hover:bg-primary/5 cursor-pointer"
+                          ? "bg-brand-green/10 border-brand-green cursor-pointer"
+                          : "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
                     }`}
                   >
                     <Checkbox
@@ -441,7 +441,7 @@ export default function FinesFeesSelectionPage({
                         </p>
                       )}
                     </div>
-                    <span className="text-sm font-bold text-primary shrink-0 tabular-nums">
+                    <span className="text-sm font-bold text-brand-green shrink-0 tabular-nums">
                       ₱{fee.amount.toFixed(2)}
                     </span>
                   </div>
@@ -451,7 +451,7 @@ export default function FinesFeesSelectionPage({
 
               {fees.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
-                  <CheckCircle2 className="h-12 w-12 mx-auto mb-2 opacity-50 text-primary" />
+                  <CheckCircle2 className="h-12 w-12 mx-auto mb-2 opacity-50 text-brand-green" />
                   <p className="text-sm font-medium">No outstanding fees</p>
                 </div>
               )}
@@ -459,8 +459,8 @@ export default function FinesFeesSelectionPage({
           </Card>
 
           {/* Fines Section */}
-          <Card className="h-fit bg-card border border-border/50">
-            <CardHeader className="pb-4">
+          <Card className="h-fit bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+            <CardHeader className="pb-4 relative z-10 pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-destructive" />
@@ -643,7 +643,7 @@ export default function FinesFeesSelectionPage({
                         ? `Total for ${selectedCount} selected item${selectedCount === 1 ? "" : "s"}`
                         : "Select the items you want to pay"}
                   </p>
-                  <p className="text-xl sm:text-2xl font-bold text-primary tabular-nums">₱{grandTotal.toFixed(2)}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-brand-green tabular-nums">₱{grandTotal.toFixed(2)}</p>
                 </>
               )}
             </div>
@@ -655,7 +655,7 @@ export default function FinesFeesSelectionPage({
               <Button
                 onClick={handleContinue}
                 disabled={!hasSelection || isAdvancing || isLoading}
-                className="shrink-0 px-6 sm:px-8 gap-2"
+                className="shrink-0 px-6 sm:px-8 gap-2 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
               >
                 {isAdvancing ? (
                   <>
