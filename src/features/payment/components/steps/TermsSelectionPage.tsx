@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Loader2, UserCircle } from "lucide-react";
 import { PaymentBrandHeader } from "../PaymentBrandHeader";
 import { PaymentProgressBar } from "../PaymentProgressBar";
+import { BackConfirmationModal } from "../BackConfirmationModal";
 import { StudentData, TermData, Term, TermsSelectionPageProps } from "../../types/types";
 
 export default function TermsSelectionPage({
@@ -19,6 +20,7 @@ export default function TermsSelectionPage({
   const [isLoading, setIsLoading] = useState(true);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   useEffect(() => {
     const fetchTerms = async () => {
@@ -87,169 +89,168 @@ export default function TermsSelectionPage({
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 relative overflow-hidden font-sans">
-      {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-brand-leaf/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-brand-green/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
-
-      <div className="max-w-4xl mx-auto space-y-8 relative z-10">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+      <div className="relative z-10 w-full max-w-4xl flex flex-col items-center">
         <PaymentBrandHeader />
+        <div className="mb-8 w-full mt-4">
+          <PaymentProgressBar
+            currentStep={currentStep}
+            subtitle="Select the academic term you want to pay for"
+          />
+        </div>
 
-        <PaymentProgressBar
-          currentStep={currentStep}
-          subtitle="Select the academic term you want to pay for"
-        />
-
-        {/* Back Button */}
-        <Button variant="ghost" onClick={onBack} size="sm" className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          <span className="min-[400px]:hidden">Back</span>
-          <span className="hidden min-[400px]:inline">Back to Student Verification</span>
-        </Button>
-
-        {/* Student Info Banner Card */}
-        <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
-          <CardContent className="px-4 sm:px-6 py-4 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
-                <UserCircle className="h-6 w-6 text-brand-green" />
-              </div>
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <p className="font-bold text-lg leading-tight truncate text-foreground">{studentData.name}</p>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
-                  <span className="font-mono font-bold text-foreground/80">{studentData.studentId}</span>
-                  <span className="text-muted-foreground/50">•</span>
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="h-3.5 w-3.5 shrink-0" />
-                    <span>
-                      {studentData.programAcronym || studentData.programShortName || studentData.program}
+        <div className="w-full space-y-8">
+          {/* Student Info Banner Card */}
+          <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+            <CardContent className="px-4 sm:px-6 py-4 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/5">
+                  <UserCircle className="h-6 w-6 text-brand-green" />
+                </div>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <p className="font-extrabold text-lg leading-tight truncate bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">{studentData.name}</p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+                    <span className="font-mono font-bold text-branding-green">{studentData.studentId}</span>
+                    <span className="text-branding-green/70">•</span>
+                    <span className="flex items-center gap-1 text-branding-green/90">
+                      <BookOpen className="h-3.5 w-3.5 shrink-0" />
+                      <span>
+                        {studentData.programAcronym || studentData.programShortName || studentData.program}
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Term Selection Card */}
-        <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-6">
-          {/* Top-left corner accent */}
-          <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
-          <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          {/* Term Selection Card */}
+          <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-6">
+            {/* Top-left corner accent */}
+            <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+            <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+            <CardHeader className="px-6 sm:px-8 pt-8 pb-2 relative z-10">
+              <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Select Academic Term</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                Choose the term to view and settle your outstanding dues
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-6 sm:px-8 pb-8 pt-4">
+              {isLoading ? (
+                <div className="py-12 text-center text-muted-foreground text-sm flex items-center justify-center gap-2 relative z-10">
+                  <Loader2 className="h-5 w-5 animate-spin text-brand-green" />
+                  Loading available terms...
+                </div>
+              ) : error ? (
+                <div className="py-12 text-center">
+                  <p className="text-sm text-destructive font-medium">{error}</p>
+                </div>
+              ) : terms.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-sm text-muted-foreground">No payment terms available at the moment.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {notEnrolledInCurrentTerm && (
+                    <div className="rounded-lg border border-warning bg-warning-muted px-4 py-3">
+                      <p className="text-sm font-bold text-warning-foreground">
+                        You are not enrolled for the current term
+                      </p>
+                      <p className="text-xs text-warning-foreground font-medium mt-0.5">
+                        {openableTerms.length > 0
+                          ? "Your earlier terms are listed below. They are view only — you can review your records and payments, but no new payment can be made against them."
+                          : "We could not find any records for you in the terms listed. Please contact your organization."}
+                      </p>
+                    </div>
+                  )}
 
-          <CardHeader className="pb-4 relative z-10 pt-8">
-            <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Select Academic Term</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              Choose the term to view and settle your outstanding dues
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pt-4">
-            {isLoading ? (
-              <div className="py-12 text-center text-muted-foreground text-sm flex items-center justify-center gap-2 relative z-10">
-                <Loader2 className="h-5 w-5 animate-spin text-brand-green" />
-                Loading available terms...
-              </div>
-            ) : error ? (
-              <div className="py-12 text-center">
-                <p className="text-sm text-destructive font-medium">{error}</p>
-              </div>
-            ) : terms.length === 0 ? (
-              <div className="py-12 text-center">
-                <p className="text-sm text-muted-foreground">No payment terms available at the moment.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {notEnrolledInCurrentTerm && (
-                  <div className="rounded-lg border border-warning bg-warning-muted px-4 py-3">
-                    <p className="text-sm font-bold text-warning-foreground">
-                      You are not enrolled for the current term
-                    </p>
-                    <p className="text-xs text-warning-foreground font-medium mt-0.5">
-                      {openableTerms.length > 0
-                        ? "Your earlier terms are listed below. They are view only — you can review your records and payments, but no new payment can be made against them."
-                        : "We could not find any records for you in the terms listed. Please contact your organization."}
-                    </p>
-                  </div>
-                )}
+                  {terms.map((term) => {
+                    const selectable = isSelectable(term);
 
-                {terms.map((term) => {
-                  const selectable = isSelectable(term);
-
-                  return (
-                    <button
-                      key={term.id}
-                      onClick={() => selectable && setSelectedTermId(term.id)}
-                      disabled={!selectable}
-                      aria-disabled={!selectable}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${!selectable
+                    return (
+                      <button
+                        key={term.id}
+                        onClick={() => selectable && setSelectedTermId(term.id)}
+                        disabled={!selectable}
+                        aria-disabled={!selectable}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${!selectable
                           ? "border-border bg-muted/30 opacity-70 cursor-not-allowed"
                           : selectedTermId === term.id
                             ? "border-brand-green bg-brand-green/5 shadow-sm cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
                             : "border-border bg-white cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
-                        }`}
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-brand-green/10" : "bg-muted"}`}>
-                          <CalendarDays className={`h-5 w-5 ${selectable ? "text-brand-green" : "text-muted-foreground"}`} />
-                        </div>
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <div className="flex flex-col min-[450px]:flex-row min-[450px]:items-center gap-1 sm:gap-2">
-                            <p className="font-bold text-base text-foreground">
-                              {term.displayName}
-                            </p>
-                            {term.isActive && (
-                              <span className="inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[11px] font-bold text-brand-green uppercase">
-                                Current Term
-                              </span>
-                            )}
+                          }`}
+                      >
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                          <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-brand-green/10" : "bg-muted"}`}>
+                            <CalendarDays className={`h-5 w-5 ${selectable ? "text-brand-green" : "text-muted-foreground"}`} />
                           </div>
-                          {!selectable ? (
-                            <p className="text-xs font-medium text-warning-foreground">
-                              {term.isActive
-                                ? "You are not enrolled for this term"
-                                : "No records for this term"}
-                            </p>
-                          ) : isViewOnly ? (
-                            <p className="text-xs font-medium text-muted-foreground">
-                              View only — records and payment history
-                            </p>
-                          ) : null}
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <div className="flex flex-col min-[450px]:flex-row min-[450px]:items-center gap-1 sm:gap-2">
+                              <p className="font-bold text-base text-foreground">
+                                {term.displayName}
+                              </p>
+                              {term.isActive && (
+                                <span className="inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[11px] font-bold text-brand-green uppercase">
+                                  Current Term
+                                </span>
+                              )}
+                            </div>
+                            {!selectable ? (
+                              <p className="text-xs font-medium text-warning-foreground">
+                                {term.isActive
+                                  ? "You are not enrolled for this term"
+                                  : "No records for this term"}
+                              </p>
+                            ) : isViewOnly ? (
+                              <p className="text-xs font-medium text-muted-foreground">
+                                View only — records and payment history
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                      {selectable && (
-                        <ChevronRight
-                          className={`h-5 w-5 shrink-0 transition-transform duration-300 ${selectedTermId === term.id ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
-                            }`}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                        {selectable && (
+                          <ChevronRight
+                            className={`h-5 w-5 shrink-0 transition-transform duration-300 ${selectedTermId === term.id ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
+                              }`}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        <div className="flex justify-end mt-4">
-          <Button
-            onClick={handleContinue}
-            disabled={!selectedTermId || isLoading || isAdvancing}
-            className="w-full min-[400px]:w-auto gap-2 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
-          >
-            {isAdvancing ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Loading your records…
-              </>
-            ) : (
-              <>
-                {isViewOnly ? "View Records" : "View Organizations"}
-                <ChevronRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col-reverse min-[400px]:flex-row justify-end gap-3 mt-4">
+            <Button type="button" variant="outline" onClick={() => setShowBackConfirm(true)} className="w-full min-[400px]:w-auto">
+              Back
+            </Button>
+            <Button
+              onClick={handleContinue}
+              disabled={!selectedTermId || isLoading || isAdvancing}
+              className="w-full min-[400px]:w-auto gap-2 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
+            >
+              {isAdvancing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading your records…
+                </>
+              ) : (
+                <>
+                  {isViewOnly ? "View Records" : "View Organizations"}
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
+
+      <BackConfirmationModal
+        open={showBackConfirm}
+        onOpenChange={setShowBackConfirm}
+        onConfirm={onBack}
+      />
     </div>
   );
 }
