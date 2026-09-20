@@ -28,7 +28,7 @@ export default function PaymentPage() {
   const [currentStep, setCurrentStep] = useState<PaymentStep>("verification");
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [selectedTerm, setSelectedTerm] = useState<TermData | null>(null);
-  
+
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [organizationDues, setOrganizationDues] = useState<OrganizationDueData[]>([]);
   const [isLoadingDues, setIsLoadingDues] = useState(false);
@@ -95,6 +95,10 @@ export default function PaymentPage() {
           orgAuditorName: org.orgAuditorName,
           orgAuditorUrl: org.orgAuditorUrl,
           orgAuditorNumber: org.orgAuditorNumber,
+          orgBankName: org.orgBankName,
+          orgBankAccountNumber: org.orgBankAccountNumber,
+          orgBankAccountName: org.orgBankAccountName,
+          orgBankQrUrl: org.orgBankQrUrl,
         }))
       );
     } catch (error) {
@@ -121,7 +125,7 @@ export default function PaymentPage() {
     setSelectedTerm(term);
     setSelectedOrgId(null);
     setSelectedPaymentItems(null);
-    
+
     if (studentData) {
       await loadStudentDues(studentData.studentId, term.AY, term.semester);
     }
@@ -171,7 +175,7 @@ export default function PaymentPage() {
       {currentStep === "verification" && (
         <StudentVerificationPage onVerified={handleStudentVerified} currentStep={1} />
       )}
-      
+
       {currentStep === "term" && studentData && (
         <TermsSelectionPage
           currentStep={2}
