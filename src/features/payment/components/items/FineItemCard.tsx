@@ -60,7 +60,7 @@ export function FineItemCard({
         aria-label={`Select ${fine.title}`}
         onCheckedChange={() => isSelectable && onToggle(fine.refId)}
         onClick={(e) => e.stopPropagation()}
-        className="mt-0.5"
+        className="mt-0.5 data-[state=checked]:bg-destructive data-[state=checked]:border-destructive"
       />
       <div className="flex-1 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
