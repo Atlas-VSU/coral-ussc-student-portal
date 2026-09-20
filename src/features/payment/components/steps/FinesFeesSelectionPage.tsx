@@ -7,32 +7,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays, ArrowLeft, BookOpen, Building2, Receipt, AlertCircle, CheckCircle2, Loader2, UserCircle } from "lucide-react";
-import { PaymentBrandHeader } from "./components/PaymentBrandHeader";
-import { PaymentProgressBar } from "./components/PaymentProgressBar";
-import { StudentData, TermData, OrganizationData, FeeItem, Fine, FineItem } from "./types";
-
-interface FinesFeesSelectionPageProps {
-  studentData: StudentData;
-  selectedTerm: TermData | null;
-  organizationData: OrganizationData;
-  currentStep: 1 | 2 | 3 | 4 | 5;
-  fees: FeeItem[];
-  fines: Fine[];
-  fineItems: FineItem[];
-  /** True while the parent is re-fetching dues — coming back to this step
-   *  reloads them, and without this the stale amounts sit there unmarked. */
-  isLoading?: boolean;
-  onBack: () => void;
-  onNext: (selectedItems: {
-    fees: FeeItem[];
-    fines: Fine[];
-    fineItems: FineItem[];
-    feeAmount: number;
-    fineAmount: number;
-    totalAmount: number;
-  }) => void | Promise<void>;
-}
-
+import { PaymentBrandHeader } from "../PaymentBrandHeader";
+import { PaymentProgressBar } from "../PaymentProgressBar";
+import { StudentData, TermData, OrganizationData, FeeItem, Fine, FineItem, FinesFeesSelectionPageProps } from "../../types/types";
+import { FeeItemCard } from "../items/FeeItemCard";
+import { FineItemCard } from "../items/FineItemCard";
 export default function FinesFeesSelectionPage({
   studentData,
   organizationData,
@@ -279,9 +258,9 @@ export default function FinesFeesSelectionPage({
                 </div>
               </div>
             </div>
-            
+
             <Separator className="bg-border/50" />
-            
+
             {/* Organization row */}
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
@@ -330,13 +309,12 @@ export default function FinesFeesSelectionPage({
               {fees.length > 0 && (
                 <>
                   <div
-                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
-                      allFeesSelected
+                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${allFeesSelected
                         ? "bg-brand-green/10 border-brand-green shadow-sm"
                         : hasPayableFees
                           ? "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
                           : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
-                    }`}
+                      }`}
                     onClick={() => {
                       if (!hasPayableFees) return;
                       toggleAllFees(!allFeesSelected);
@@ -351,7 +329,7 @@ export default function FinesFeesSelectionPage({
                         toggleAllFees(checked === true);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                     
+
                     />
                     <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                       Select All Fees
@@ -382,69 +360,18 @@ export default function FinesFeesSelectionPage({
                 {fees.map((fee) => {
                   const isSelectable = !isViewOnly && fee.isPayable !== false;
                   const isSelected = selectedFeeIds.has(fee.id);
+                  const status = getPaymentStatus(fee);
 
                   return (
-                  <div
-                    key={fee.id}
-                    role={isSelectable ? "button" : undefined}
-                    tabIndex={isSelectable ? 0 : undefined}
-                    onClick={() => isSelectable && toggleFee(fee.id)}
-                    onKeyDown={(event) => {
-                      if (!isSelectable) return;
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        toggleFee(fee.id);
-                      }
-                    }}
-                    className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
-                      !isSelectable
-                        ? "bg-muted/40 border-border/50"
-                        : isSelected
-                          ? "bg-brand-green/10 border-brand-green cursor-pointer"
-                          : "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
-                    }`}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      disabled={!isSelectable}
-                      aria-label={`Select ${fee.description}`}
-                      onCheckedChange={() => isSelectable && toggleFee(fee.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-0.5"
+                    <FeeItemCard
+                      key={fee.id}
+                      fee={fee}
+                      isSelectable={isSelectable}
+                      isSelected={isSelected}
+                      onToggle={toggleFee}
+                      statusLabel={status.label}
+                      statusClassName={status.className}
                     />
-                    <div className="flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-bold text-foreground">{fee.description}</p>
-                        {(() => {
-                          const status = getPaymentStatus(fee);
-                          return (
-                            <Badge variant="outline" className={`rounded-full font-bold uppercase text-[11px] ${status.className}`}>
-                              {status.label}
-                            </Badge>
-                          );
-                        })()}
-                      </div>
-                      {formatDisplayDate(fee.dueDate) && (
-                        <p className="text-xs text-muted-foreground font-medium">Due: {formatDisplayDate(fee.dueDate)}</p>
-                      )}
-                      {fee.paymentState === "pending" && (
-                        <p className="text-xs text-warning-foreground font-medium">
-                          Status: Pending verification (not selectable)
-                        </p>
-                      )}
-                      {/* A fee that was declined, resubmitted and approved
-                          showed "Approved" alongside the old rejection reason.
-                          Only surface it while the fee is actually declined. */}
-                      {fee.latestRejectionReason && fee.paymentState === "rejected" && (
-                        <p className="text-xs text-destructive font-medium">
-                          Last rejected reason: {fee.latestRejectionReason}
-                        </p>
-                      )}
-                    </div>
-                    <span className="text-sm font-bold text-brand-green shrink-0 tabular-nums">
-                      ₱{fee.amount.toFixed(2)}
-                    </span>
-                  </div>
                   );
                 })}
               </div>
@@ -477,13 +404,12 @@ export default function FinesFeesSelectionPage({
               {(pendingFines.length > 0 || payableFines.length > 0) && (
                 <>
                   <div
-                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
-                      allFinesSelected
+                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${allFinesSelected
                         ? "bg-destructive/10 border-destructive shadow-sm"
                         : hasPayableFineItems
                           ? "bg-card border-border hover:bg-destructive/5 cursor-pointer"
                           : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
-                    }`}
+                      }`}
                     onClick={() => {
                       if (!hasPayableFineItems) return;
                       toggleAllFineItems(!allFinesSelected);
@@ -498,7 +424,7 @@ export default function FinesFeesSelectionPage({
                         toggleAllFineItems(checked === true);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                     
+
                     />
                     <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                       Select All Fines
@@ -543,69 +469,16 @@ export default function FinesFeesSelectionPage({
                   const isSelected = selectedFineItemIds.has(fine.refId);
 
                   return (
-                    <div
+                    <FineItemCard
                       key={fine.refId}
-                      role={isSelectable ? "button" : undefined}
-                      tabIndex={isSelectable ? 0 : undefined}
-                      onClick={() => isSelectable && toggleFineItem(fine.refId)}
-                      onKeyDown={(event) => {
-                        if (!isSelectable) return;
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          toggleFineItem(fine.refId);
-                        }
-                      }}
-                      className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
-                        !isSelectable
-                          ? "bg-muted/40 border-border/50"
-                          : isSelected
-                            ? "bg-destructive/10 border-destructive cursor-pointer"
-                            : "bg-card border-border hover:bg-destructive/5 cursor-pointer"
-                      }`}
-                    >
-                      <Checkbox
-                        checked={isSelected}
-                        disabled={!isSelectable}
-                        aria-label={`Select ${fine.title}`}
-                        onCheckedChange={() => isSelectable && toggleFineItem(fine.refId)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-bold text-foreground">{fine.title}</p>
-                          <Badge variant="outline" className={`rounded-full font-bold uppercase text-[11px] ${status.className}`}>
-                            {status.label}
-                          </Badge>
-                        </div>
-                        {formatDisplayDate(fine.date) && (
-                          <p className="text-xs text-muted-foreground font-medium">Date: {formatDisplayDate(fine.date)}</p>
-                        )}
-                        {parentFine?.reason && (
-                          <p className="text-xs text-muted-foreground italic font-medium">{parentFine.reason}</p>
-                        )}
-                        {fine.isPending && (
-                          <p className="text-xs text-warning-foreground font-medium">
-                            Status: Pending verification (not selectable)
-                          </p>
-                        )}
-                        {fine.isPaid && !fine.isPending && (
-                          <p className="text-xs text-success font-medium">
-                            {fine.isWaived ? "Waived by the organization" : "Settled"}
-                          </p>
-                        )}
-                        {/* Only the items that were actually in the declined
-                            submission carry its reason. */}
-                        {fine.latestRejectionReason && !fine.isPending && (
-                          <p className="text-xs text-destructive font-medium">
-                            Last rejected reason: {fine.latestRejectionReason}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-sm font-bold text-destructive shrink-0 tabular-nums">
-                        ₱{fine.amount.toFixed(2)}
-                      </span>
-                    </div>
+                      fine={fine}
+                      parentFine={parentFine}
+                      isSelectable={isSelectable}
+                      isSelected={isSelected}
+                      onToggle={toggleFineItem}
+                      statusLabel={status.label}
+                      statusClassName={status.className}
+                    />
                   );
                 })}
               </div>

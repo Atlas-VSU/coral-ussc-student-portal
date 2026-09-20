@@ -1,7 +1,4 @@
-interface PaymentProgressBarProps {
-  currentStep: 1 | 2 | 3 | 4 | 5;
-  subtitle?: string;
-}
+import { PaymentProgressBarProps } from "../types/types";
 
 const steps = [
   { id: 1, label: "Verification" },
@@ -23,28 +20,25 @@ export function PaymentProgressBar({ currentStep, subtitle }: PaymentProgressBar
             <div key={step.id} className="relative flex flex-col items-center min-w-0">
               {index < steps.length - 1 && (
                 <div
-                  className={`absolute top-4 left-1/2 h-0.5 w-full ${
-                    isCompleted ? "bg-brand-green" : "bg-border/60"
-                  }`}
+                  className={`absolute top-4 left-1/2 h-0.5 w-full ${isCompleted ? "bg-brand-green" : "bg-border/60"
+                    }`}
                 />
               )}
 
               <div className="relative z-10 flex flex-col items-center gap-2 min-w-0">
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
-                    isCompleted || isActive
-                      ? "bg-linear-to-r from-brand-leaf to-brand-green text-white shadow-sm"
-                      : "bg-muted text-muted-foreground border border-border"
-                  }`}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${isCompleted || isActive
+                    ? "bg-linear-to-r from-brand-leaf to-brand-green text-white shadow-sm"
+                    : "bg-muted text-brand-green border border-border"
+                    }`}
                 >
                   {step.id}
                 </div>
                 <span
-                  className={`hidden min-[420px]:block text-[11px] sm:text-xs text-center font-bold ${
-                    isCompleted || isActive 
-                      ? "text-foreground" 
-                      : "text-muted-foreground"
-                  }`}
+                  className={`hidden min-[420px]:block text-[11px] sm:text-xs text-center font-bold ${isCompleted || isActive
+                    ? "bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text"
+                    : "text-brand-green/50"
+                    }`}
                 >
                   {step.label}
                 </span>
@@ -54,7 +48,7 @@ export function PaymentProgressBar({ currentStep, subtitle }: PaymentProgressBar
         })}
       </div>
       {subtitle && (
-        <p className="mt-3 text-center text-xs text-muted-foreground font-medium">
+        <p className="mt-5 text-center text-xs text-brand-green font-medium">
           {subtitle}
         </p>
       )}

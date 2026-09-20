@@ -4,29 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Loader2, UserCircle } from "lucide-react";
-import { PaymentBrandHeader } from "./components/PaymentBrandHeader";
-import { PaymentProgressBar } from "./components/PaymentProgressBar";
-import { StudentData } from "./types";
-
-interface Term {
-  id: string;
-  AY: string;
-  semester: string;
-  displayName: string;
-  isActive?: boolean;
-  /** Whether this student holds any record for the term. Absent when the API
-   *  was called without a studentId. */
-  hasRecords?: boolean;
-}
-
-interface TermsSelectionPageProps {
-  studentData: StudentData;
-  currentStep: 1 | 2 | 3 | 4 | 5;
-  onBack: () => void;
-  /** May be async — the parent loads the student's dues before advancing, so
-   *  the button has to stay responsive for the length of that fetch. */
-  onNext: (selectedTerm: { AY: string; semester: string }) => void | Promise<void>;
-}
+import { PaymentBrandHeader } from "../PaymentBrandHeader";
+import { PaymentProgressBar } from "../PaymentProgressBar";
+import { StudentData, TermData, Term, TermsSelectionPageProps } from "../../types/types";
 
 export default function TermsSelectionPage({
   studentData,
@@ -114,7 +94,7 @@ export default function TermsSelectionPage({
 
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         <PaymentBrandHeader />
-        
+
         <PaymentProgressBar
           currentStep={currentStep}
           subtitle="Select the academic term you want to pay for"
@@ -156,7 +136,7 @@ export default function TermsSelectionPage({
           {/* Top-left corner accent */}
           <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
           <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
-          
+
           <CardHeader className="pb-4 relative z-10 pt-8">
             <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Select Academic Term</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
@@ -196,55 +176,53 @@ export default function TermsSelectionPage({
                   const selectable = isSelectable(term);
 
                   return (
-                  <button
-                    key={term.id}
-                    onClick={() => selectable && setSelectedTermId(term.id)}
-                    disabled={!selectable}
-                    aria-disabled={!selectable}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
-                      !selectable
-                        ? "border-border bg-muted/30 opacity-70 cursor-not-allowed"
-                        : selectedTermId === term.id
-                          ? "border-brand-green bg-brand-green/5 shadow-sm cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
-                          : "border-border bg-white cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-brand-green/10" : "bg-muted"}`}>
-                        <CalendarDays className={`h-5 w-5 ${selectable ? "text-brand-green" : "text-muted-foreground"}`} />
-                      </div>
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <div className="flex flex-col min-[450px]:flex-row min-[450px]:items-center gap-1 sm:gap-2">
-                          <p className="font-bold text-base text-foreground">
-                            {term.displayName}
-                          </p>
-                          {term.isActive && (
-                            <span className="inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[11px] font-bold text-brand-green uppercase">
-                              Current Term
-                            </span>
-                          )}
-                        </div>
-                        {!selectable ? (
-                          <p className="text-xs font-medium text-warning-foreground">
-                            {term.isActive
-                              ? "You are not enrolled for this term"
-                              : "No records for this term"}
-                          </p>
-                        ) : isViewOnly ? (
-                          <p className="text-xs font-medium text-muted-foreground">
-                            View only — records and payment history
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-                    {selectable && (
-                      <ChevronRight
-                        className={`h-5 w-5 shrink-0 transition-transform duration-300 ${
-                          selectedTermId === term.id ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
+                    <button
+                      key={term.id}
+                      onClick={() => selectable && setSelectedTermId(term.id)}
+                      disabled={!selectable}
+                      aria-disabled={!selectable}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-center justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${!selectable
+                          ? "border-border bg-muted/30 opacity-70 cursor-not-allowed"
+                          : selectedTermId === term.id
+                            ? "border-brand-green bg-brand-green/5 shadow-sm cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
+                            : "border-border bg-white cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5"
                         }`}
-                      />
-                    )}
-                  </button>
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <div className={`p-3 rounded-xl shrink-0 ${selectable ? "bg-brand-green/10" : "bg-muted"}`}>
+                          <CalendarDays className={`h-5 w-5 ${selectable ? "text-brand-green" : "text-muted-foreground"}`} />
+                        </div>
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <div className="flex flex-col min-[450px]:flex-row min-[450px]:items-center gap-1 sm:gap-2">
+                            <p className="font-bold text-base text-foreground">
+                              {term.displayName}
+                            </p>
+                            {term.isActive && (
+                              <span className="inline-flex w-fit items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[11px] font-bold text-brand-green uppercase">
+                                Current Term
+                              </span>
+                            )}
+                          </div>
+                          {!selectable ? (
+                            <p className="text-xs font-medium text-warning-foreground">
+                              {term.isActive
+                                ? "You are not enrolled for this term"
+                                : "No records for this term"}
+                            </p>
+                          ) : isViewOnly ? (
+                            <p className="text-xs font-medium text-muted-foreground">
+                              View only — records and payment history
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                      {selectable && (
+                        <ChevronRight
+                          className={`h-5 w-5 shrink-0 transition-transform duration-300 ${selectedTermId === term.id ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
+                            }`}
+                        />
+                      )}
+                    </button>
                   );
                 })}
               </div>

@@ -3,19 +3,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentFormData, paymentSchema } from "@/lib/validators";
-import { OnlinePaymentMethod } from "../types";
-
-export interface ImageData {
-  file: File;
-  preview: string;
-}
-
-export type FormStatus = "success" | "submitting" | "idle" | "error";
-
-interface UsePaymentFormOptions {
-  initialValues?: Partial<PaymentFormData>;
-  onSubmitPayment?: (data: PaymentFormData, image: ImageData | null) => Promise<void>;
-}
+import { ImageData, FormStatus, UsePaymentFormOptions, OnlinePaymentMethod } from "../types/types";
 
 export function usePaymentForm(options?: UsePaymentFormOptions) {
   const [image, setImage] = useState<ImageData | null>(null);

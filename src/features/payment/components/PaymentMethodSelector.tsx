@@ -1,25 +1,11 @@
 import { cn } from "@/lib/utils";
-import { OnlinePaymentMethod } from "../types";
-import { Landmark, Smartphone, type LucideIcon } from "lucide-react";
-
-export interface PaymentMethodOption {
-  value: OnlinePaymentMethod;
-  label: string;
-  icon: LucideIcon;
-  description: string;
-}
+import { OnlinePaymentMethod, PaymentMethodOption, PaymentMethodSelectorProps } from "../types/types";
+import { Landmark, Smartphone } from "lucide-react";
 
 const ALL_PAYMENT_METHODS: readonly PaymentMethodOption[] = [
   { value: "gcash", label: "GCash", icon: Smartphone, description: "Mobile wallet" },
   { value: "bank_transfer", label: "Bank", icon: Landmark, description: "Bank / InstaPay" },
 ];
-
-interface PaymentMethodSelectorProps {
-  value: string;
-  error?: string;
-  onSelect: (value: OnlinePaymentMethod) => void;
-  methods?: readonly PaymentMethodOption[];
-}
 
 export function PaymentMethodSelector({ value, error, onSelect, methods }: PaymentMethodSelectorProps) {
   const displayMethods = methods ?? ALL_PAYMENT_METHODS;

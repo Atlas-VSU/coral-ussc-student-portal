@@ -4,12 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PaymentFormData } from "@/lib/validators";
 
-interface SuccessScreenProps {
-  form: PaymentFormData;
-  onReset: () => void;
-  paymentHistoryId?: string;
-  submissionCount?: number;
-}
+import { SuccessScreenProps } from "../types/types";
 
 export function SuccessScreen({
   form,
