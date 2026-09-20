@@ -30,16 +30,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
-interface UpdateInformationDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-interface ProgramOption {
-  value: string;
-  label: string;
-}
+import { UpdateInformationDialogProps, ProgramOption, UpdateInfoStep } from "../types";
 
 const FALLBACK_PROGRAMS: ProgramOption[] = [
   { value: "bscs", label: "Bachelor of Science in Computer Science" },
@@ -56,13 +47,13 @@ const verifySchema = z.object({
 
 type VerifyFormData = z.infer<typeof verifySchema>;
 
-type Step = "verify" | "email" | "sent";
+
 
 export function UpdateInformationDialog({
   isOpen,
   onOpenChange,
 }: UpdateInformationDialogProps) {
-  const [step, setStep] = useState<Step>("verify");
+  const [step, setStep] = useState<UpdateInfoStep>("verify");
   const [programs, setPrograms] = useState<ProgramOption[]>(FALLBACK_PROGRAMS);
   const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
   const [programLoadError, setProgramLoadError] = useState<string | null>(null);
@@ -176,24 +167,25 @@ export function UpdateInformationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
+      <DialogContent className="max-w-md bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-8 overflow-hidden">
+        {/* Top-left corner accent */}
+        <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green" />
+        <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green" />
+
         {step === "verify" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <Search className="w-7 h-7 text-primary" />
-              </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+            <DialogHeader className="items-center text-center relative z-10">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Verify Your Identity
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm max-w-sm">
+              <DialogDescription className="text-muted-foreground text-sm max-w-sm text-center text-brand-green">
                 Enter your Student ID and program to confirm your identity before updating your record.
               </DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleSubmit(onVerifySubmit)} className="space-y-5 mt-6">
               <div className="space-y-2">
-                <Label className="text-primary font-semibold text-sm">Student ID</Label>
+                <Label className="text-brand-green font-bold text-sm">Student ID</Label>
                 <Input
                   {...register("studentId")}
                   placeholder="25-1-12345"
@@ -202,12 +194,12 @@ export function UpdateInformationDialog({
                 {errors.studentId ? (
                   <p className="text-xs text-destructive">{errors.studentId.message}</p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">Format: XX-X-XXXXX</p>
+                  <p className="text-xs text-brand-green/90">Format: XX-X-XXXXX</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-primary font-semibold text-sm">Program</Label>
+                <Label className="text-brand-green font-bold text-sm">Program</Label>
                 <Select
                   disabled={isLoadingPrograms || isVerifying}
                   value={programValue}
@@ -235,7 +227,7 @@ export function UpdateInformationDialog({
               )}
 
               <div className="flex flex-col gap-3 pt-3">
-                <Button type="submit" disabled={isVerifying} className="w-full">
+                <Button type="submit" disabled={isVerifying} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105">
                   {isVerifying ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />Verifying…</>) : "Verify Identity"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isVerifying} className="w-full">
@@ -248,14 +240,11 @@ export function UpdateInformationDialog({
 
         {step === "email" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <UserCheck className="w-7 h-7 text-primary" />
-              </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+            <DialogHeader className="items-center text-center relative z-10">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Identity Verified
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm max-w-sm">
+              <DialogDescription className="text-muted-foreground text-sm max-w-sm text-justify">
                 {verifiedStudentName ? `Welcome, ${verifiedStudentName}. ` : ""}
                 Please confirm to send the verification link.
               </DialogDescription>
@@ -263,7 +252,7 @@ export function UpdateInformationDialog({
 
             <form onSubmit={handleSendLink} className="space-y-5 mt-6">
               <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 text-center space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold">Registered Email Address</p>
+                <p className="text-xs text-brand-green font-bold">Registered Email Address</p>
                 <p className="text-lg font-bold font-mono text-foreground break-all">{maskedEmail}</p>
               </div>
               <p className="text-xs text-center text-muted-foreground max-w-xs mx-auto leading-relaxed">
@@ -271,8 +260,8 @@ export function UpdateInformationDialog({
               </p>
 
               <div className="flex flex-col gap-3 pt-3">
-                <Button type="submit" disabled={isSending} className="w-full">
-                  {isSending ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />Sending Link…</>) : (<><Mail className="w-4 h-4 mr-2" />Send Update Link</>)}
+                <Button type="submit" disabled={isSending} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105">
+                  {isSending ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />Sending Link…</>) : (<span>Send Update Link</span>)}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setStep("verify")} disabled={isSending} className="w-full">
                   <ChevronLeft className="w-4 h-4 mr-1" />Back
@@ -284,16 +273,13 @@ export function UpdateInformationDialog({
 
         {step === "sent" && (
           <>
-            <DialogHeader className="items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <CheckCircle className="w-7 h-7 text-primary" />
-              </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
+            <DialogHeader className="items-center text-center relative z-10">
+              <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
                 Update Link Sent
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm max-w-sm">
-                We&apos;ve sent an update link to{" "}
-                <span className="font-bold text-foreground font-mono">{maskedEmail}</span>.
+                We&apos;ve sent an update link to:{" "}
+                <span className="font-bold text-foreground font-mono">{maskedEmail}{" "}</span>.
                 Click the link in the email to update your record.
               </DialogDescription>
             </DialogHeader>
@@ -302,7 +288,7 @@ export function UpdateInformationDialog({
               <p className="text-xs text-center text-muted-foreground">
                 If you didn&apos;t receive the email, please check your spam folder or try again in a few minutes.
               </p>
-              <Button onClick={() => handleOpenChange(false)} className="w-full">
+              <Button onClick={() => handleOpenChange(false)} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105">
                 Close
               </Button>
             </div>

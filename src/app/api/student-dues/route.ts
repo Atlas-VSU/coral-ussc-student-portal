@@ -387,7 +387,7 @@ export async function GET(request: NextRequest) {
         paymentSummary: { pending: 0, verified: 0, rejected: 0, unpaid: 0 },
         fees: [],
         fines: [],
-        fineItems:[],
+        fineItems: [],
       };
 
       if (paymentState === "pending") existing.paymentSummary.pending += 1;
@@ -590,6 +590,10 @@ export async function GET(request: NextRequest) {
           orgAuditorName: orgData?.orgAuditorName || null,
           orgAuditorUrl: orgData?.orgAuditorUrl || null,
           orgAuditorNumber: orgData?.orgAuditorNumber || null,
+          orgBankName: orgData?.orgBankName || null,
+          orgBankAccountNumber: orgData?.orgBankAccountNumber || null,
+          orgBankAccountName: orgData?.orgBankAccountName || null,
+          orgBankQrUrl: orgData?.orgBankQrUrl || null,
         };
       })
       .filter(Boolean)

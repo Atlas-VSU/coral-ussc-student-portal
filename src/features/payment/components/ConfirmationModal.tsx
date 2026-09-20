@@ -10,20 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, User, GraduationCap, IdCard } from "lucide-react";
 
-interface StudentData {
-  name: string;
-  studentId: string;
-  program: string;
-  programShortName?: string;
-  programAcronym?: string;
-}
-
-interface ConfirmationModalProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  studentData: StudentData;
-}
+import { StudentData, ConfirmationModalProps } from "../types/types";
 
 export function ConfirmationModal({
   open,
@@ -35,10 +22,7 @@ export function ConfirmationModal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-md bg-card">
         <DialogHeader>
-          <div className="mx-auto w-12 h-12 bg-success-muted rounded-full flex items-center justify-center mb-2">
-            <CheckCircle2 className="w-6 h-6 text-success" />
-          </div>
-          <DialogTitle className="text-center">Confirm Your Information</DialogTitle>
+          <DialogTitle className="text-center font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Confirm Your Information</DialogTitle>
           <DialogDescription className="text-center">
             Please verify that the following details are correct
           </DialogDescription>
@@ -48,11 +32,11 @@ export function ConfirmationModal({
           {/* Full Name */}
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <User className="w-5 h-5 text-muted-foreground" />
+              <User className="w-5 h-5 text-brand-green/90" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground mb-0.5">Full Name</p>
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-sm font-bold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">
                 {studentData.name}
               </p>
             </div>
@@ -61,11 +45,11 @@ export function ConfirmationModal({
           {/* Student ID */}
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <IdCard className="w-5 h-5 text-muted-foreground" />
+              <IdCard className="w-5 h-5 text-brand-green/90" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground mb-0.5">Student ID</p>
-              <p className="text-sm font-medium text-foreground font-mono">
+              <p className="text-sm font-bold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text font-mono">
                 {studentData.studentId}
               </p>
             </div>
@@ -74,11 +58,11 @@ export function ConfirmationModal({
           {/* Program */}
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <GraduationCap className="w-5 h-5 text-muted-foreground" />
+              <GraduationCap className="w-5 h-5 text-brand-green/90" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground mb-0.5">Program</p>
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-sm font-bold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">
                 {studentData.programAcronym || studentData.programShortName || studentData.program}
               </p>
             </div>
@@ -98,7 +82,7 @@ export function ConfirmationModal({
             type="button"
             variant="success"
             onClick={onConfirm}
-            className="w-full sm:w-auto font-semibold"
+            className="w-full sm:w-auto font-semibold bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105"
           >
             Confirm & Continue
           </Button>

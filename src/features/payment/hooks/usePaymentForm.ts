@@ -3,19 +3,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentFormData, paymentSchema } from "@/lib/validators";
-import { OnlinePaymentMethod } from "../types";
-
-export interface ImageData {
-  file: File;
-  preview: string;
-}
-
-export type FormStatus = "success" | "submitting" | "idle" | "error";
-
-interface UsePaymentFormOptions {
-  initialValues?: Partial<PaymentFormData>;
-  onSubmitPayment?: (data: PaymentFormData, image: ImageData | null) => Promise<void>;
-}
+import { ImageData, FormStatus, UsePaymentFormOptions, OnlinePaymentMethod } from "../types/types";
 
 export function usePaymentForm(options?: UsePaymentFormOptions) {
   const [image, setImage] = useState<ImageData | null>(null);
@@ -44,11 +32,12 @@ export function usePaymentForm(options?: UsePaymentFormOptions) {
   });
 
   const paymentMethod = form.watch("paymentMethod");
-  const needsRef = paymentMethod === "gcash";
-  const isGcash  = paymentMethod === "gcash";
+  const isGcash = paymentMethod === "gcash";
+  const isBank = paymentMethod === "bank_transfer";
+  const needsRef = isGcash || isBank;
 
   const handleMethodSelect = (value: OnlinePaymentMethod) => {
-    form.setValue("paymentMethod", "gcash", { shouldValidate: true });
+    form.setValue("paymentMethod", value, { shouldValidate: true });
     form.setValue("referenceNumber", "");
     form.setValue("senderNumber", "");
     form.clearErrors(["referenceNumber", "senderNumber"]);
@@ -86,6 +75,7 @@ export function usePaymentForm(options?: UsePaymentFormOptions) {
     status,
     needsRef,
     isGcash,
+    isBank,
     handleMethodSelect,
     handleReset,
     onSubmit: form.handleSubmit(onSubmit),

@@ -1,44 +1,50 @@
 import { cn } from "@/lib/utils";
-import { OnlinePaymentMethod } from "../types";
+import { OnlinePaymentMethod, PaymentMethodOption, PaymentMethodSelectorProps } from "../types/types";
+import { Landmark, Smartphone } from "lucide-react";
 
-const PAYMENT_METHODS = [
-  { value: "gcash",         label: "GCash", icon: "📱", description: "Mobile wallet" },
-] as const;
+const ALL_PAYMENT_METHODS: readonly PaymentMethodOption[] = [
+  { value: "gcash", label: "GCash", icon: Smartphone, description: "Mobile wallet" },
+  { value: "bank_transfer", label: "Bank", icon: Landmark, description: "Bank / InstaPay" },
+];
 
-interface PaymentMethodSelectorProps {
-  value: string;
-  error?: string;
-  onSelect: (value: OnlinePaymentMethod) => void;
-}
+export function PaymentMethodSelector({ value, error, onSelect, methods }: PaymentMethodSelectorProps) {
+  const displayMethods = methods ?? ALL_PAYMENT_METHODS;
 
-export function PaymentMethodSelector({ value, error, onSelect }: PaymentMethodSelectorProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex gap-3">
-        {PAYMENT_METHODS.map(method => (
-          <button
-            key={method.value}
-            type="button"
-            onClick={() => onSelect(method.value)}
-            className={cn(
-              "flex flex-1 flex-col items-center gap-1.5 rounded-lg border-2 px-3 py-3 text-center transition-all cursor-pointer",
-              value === method.value
-                ? "border-primary bg-primary/5"
-                : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
-            )}
-          >
-            <span className="text-xl">{method.icon}</span>
-            <span className={cn(
-              "text-xs font-700",
-              value === method.value
-                ? "text-primary font-bold"
-                : "text-foreground font-semibold"
-            )}>
-              {method.label}
-            </span>
-            <span className="text-[11px] text-muted-foreground">{method.description}</span>
-          </button>
-        ))}
+        {displayMethods.map(method => {
+          const Icon = method.icon;
+          const isSelected = value === method.value;
+
+          return (
+            <button
+              key={method.value}
+              type="button"
+              onClick={() => onSelect(method.value)}
+              className={cn(
+                "flex flex-1 flex-col items-center gap-1.5 rounded-lg border-2 px-3 py-3 text-center transition-all cursor-pointer",
+                isSelected
+                  ? "border-green-500 bg-green-50"
+                  : "border-border bg-card hover:border-green-300 hover:bg-green-50/50"
+              )}
+            >
+              <Icon
+                className={cn("h-5 w-5", isSelected ? "text-green-600" : "text-muted-foreground")}
+                aria-hidden="true"
+              />
+              <span className={cn(
+                "text-xs font-700",
+                isSelected
+                  ? "text-green-700 font-bold"
+                  : "text-foreground font-semibold"
+              )}>
+                {method.label}
+              </span>
+              <span className="text-[11px] text-muted-foreground">{method.description}</span>
+            </button>
+          );
+        })}
       </div>
       {error && (
         <p className="text-xs text-destructive flex items-center gap-1.5 mt-0.5">

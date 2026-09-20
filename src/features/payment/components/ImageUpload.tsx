@@ -3,16 +3,7 @@ import { useRef, useState, useCallback } from "react";
 import { CheckCircle2, RefreshCw, UploadCloud, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export interface ImageData {
-  file: File;
-  preview: string;
-}
-
-interface ImageUploadProps {
-  value: ImageData | null;
-  onChange: (value: ImageData | null) => void;
-  error?: string;
-}
+import { ImageData, ImageUploadProps } from "../types/types";
 
 export function ImageUpload({ value, onChange, error }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);

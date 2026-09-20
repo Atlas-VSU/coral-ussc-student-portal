@@ -3,12 +3,13 @@ import { z } from "zod";
 import { adminDb } from "@/firebase/firebase-admin.config";
 import { FieldValue } from "firebase-admin/firestore";
 import { FieldPath } from "firebase-admin/firestore";
+import { availableOnlinePaymentMethods, configuredPaymentDetail } from "@/features/payment/utils/payment-methods";
 
 const unpaidDueSchema = z.object({
-  refId:        z.string().min(1),
-  title:        z.string(),
-  amount:       z.number().positive(),
-  paymentType:  z.enum(["fees", "fines"]),
+  refId: z.string().min(1),
+  title: z.string(),
+  amount: z.number().positive(),
+  paymentType: z.enum(["fees", "fines"]),
   parentFineId: z.string().default(""),
   // Required, not defaulted. These build the clearance document id, so a
   // silent default files the payment against the wrong term — and the defaults
@@ -16,22 +17,22 @@ const unpaidDueSchema = z.object({
   // ("2026-2027"/"1st"), so the same missing field produced two different
   // clearance documents depending on the path. Rejecting is the safe failure.
   academicYear: z.string().min(1, "Academic year is required for each due"),
-  semester:     z.string().min(1, "Semester is required for each due"),
+  semester: z.string().min(1, "Semester is required for each due"),
 });
 
 const submitPaymentSchema = z.object({
-  userName:        z.string().min(2, "Name is required"),
-  studentId:       z.string().min(1).regex(/^\d{2}-\d-\d{5}$/, "Invalid student ID format"),
-  orgId:           z.string().min(1, "Organization is required"),
-  amount:          z.number().positive("Amount must be greater than zero"),
-  paymentMethod:   z.enum(["gcash", "bank_transfer", "cash"]),
-  referenceNumber: z.string().optional(),
-  senderNumber:    z.string().optional(),
-  imageUrl:        z.string().optional(),
-  notes:           z.string().optional(),
-  dues:            z.array(unpaidDueSchema).min(1, "Select at least one due"),
-  type:            z.string().default("bulk"),
-  referenceId:     z.string().default("bulk_transaction"),
+  userName: z.string().min(2, "Name is required"),
+  studentId: z.string().min(1).regex(/^\d{2}-\d-\d{5}$/, "Invalid student ID format"),
+  orgId: z.string().min(1, "Organization is required"),
+  amount: z.number().positive("Amount must be greater than zero"),
+  paymentMethod: z.enum(["gcash", "bank_transfer", "cash"]),
+  referenceNumber: z.string().trim().optional(),
+  senderNumber: z.string().optional(),
+  imageUrl: z.string().optional(),
+  notes: z.string().optional(),
+  dues: z.array(unpaidDueSchema).min(1, "Select at least one due"),
+  type: z.string().default("bulk"),
+  referenceId: z.string().default("bulk_transaction"),
 }).superRefine((values, ctx) => {
   if (values.paymentMethod === "gcash") {
     if (!values.senderNumber || !/^([+]?63|0)9\d{9}$/.test(values.senderNumber)) {
@@ -46,6 +47,15 @@ const submitPaymentSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ["referenceNumber"],
         message: "Reference number is required for GCash payments.",
+      });
+    }
+  }
+  if (values.paymentMethod === "bank_transfer") {
+    if (!values.referenceNumber) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["referenceNumber"],
+        message: "Reference number is required for bank transfer payments.",
       });
     }
   }
@@ -114,6 +124,35 @@ export async function POST(request: NextRequest) {
 
     const userId = userDoc.id;
 
+    // The client filters methods for display, but a saved draft or a direct
+    // request must also be checked against the current organization settings.
+    const orgData = payload.paymentMethod === "cash"
+      ? undefined
+      : (await adminDb.collection("organizations").doc(payload.orgId).get()).data();
+
+    if (
+      payload.paymentMethod !== "cash" &&
+      !availableOnlinePaymentMethods(orgData).includes(payload.paymentMethod)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "This payment method is not currently available for the organization. Refresh the page and choose an available method.",
+        },
+        { status: 409 }
+      );
+    }
+
+    // Keep the bank destination configured at submission time on the payment.
+    // Later edits to the organization must not erase this historical detail.
+    const bankDestination = payload.paymentMethod === "bank_transfer"
+      ? {
+        orgBankName: configuredPaymentDetail(orgData?.orgBankName),
+        orgBankAccountNumber: configuredPaymentDetail(orgData?.orgBankAccountNumber),
+        orgBankAccountName: configuredPaymentDetail(orgData?.orgBankAccountName),
+      }
+      : {};
+
     const feeIds = payload.dues.filter(d => d.paymentType === "fees").map(d => d.refId);
     const fineItemIds = payload.dues.filter(d => d.paymentType === "fines").map(d => d.refId);
 
@@ -159,28 +198,30 @@ export async function POST(request: NextRequest) {
         .collection("paymentHistory").doc();
 
       batch.set(historyRef, {
-        paymentNumber:   now, 
-        amount:          due.amount,
-        paymentMethod:   payload.paymentMethod,
-        paymentProofId:  proofRef.id,
-        paymentType:     due.paymentType,
-        gcashReference:  payload.referenceNumber ?? null,
-        senderNumber:    payload.senderNumber    ?? "",
-        imageUrl:        payload.imageUrl        ?? "",
-        status:          "pending",
-        paidAt:          now,
-        verifiedBy:      null,
-        verifiedByName:  null,
-        verifiedAt:      null,
+        paymentNumber: now,
+        amount: due.amount,
+        paymentMethod: payload.paymentMethod,
+        paymentProofId: proofRef.id,
+        paymentType: due.paymentType,
+        gcashReference: payload.referenceNumber ?? null,
+        referenceNumber: payload.referenceNumber ?? "",
+        ...bankDestination,
+        senderNumber: payload.senderNumber ?? "",
+        imageUrl: payload.imageUrl ?? "",
+        status: "pending",
+        paidAt: now,
+        verifiedBy: null,
+        verifiedByName: null,
+        verifiedAt: null,
         rejectionReason: null,
-        notes:           payload.notes ?? `Online payment of ${due.amount} recorded for ${due.paymentType}`,
-        metadata:        { source: "public_payment_portal", submittedBy: "student" },
-        createdAt:       now,
+        notes: payload.notes ?? `Online payment of ${due.amount} recorded for ${due.paymentType}`,
+        metadata: { source: "public_payment_portal", submittedBy: "student" },
+        createdAt: now,
       });
 
       const updatedAtField = due.paymentType === "fines" ? "metadata.updatedAt" : "updatedAt";
       batch.set(adminDb.collection(due.paymentType).doc(parentId), {
-        status:           "pending",
+        status: "pending",
         [updatedAtField]: now,
       }, { merge: true });
 
@@ -207,14 +248,14 @@ export async function POST(request: NextRequest) {
       }
 
       items.push({
-        refId:        due.refId,
-        title:        due.title,
-        amount:       due.amount,
-        paymentType:  due.paymentType,
+        refId: due.refId,
+        title: due.title,
+        amount: due.amount,
+        paymentType: due.paymentType,
         parentFineId: due.paymentType === "fines" ? due.parentFineId : "",
-        historyId:    historyRef.id,
+        historyId: historyRef.id,
         academicYear: due.academicYear,
-        semester:     due.semester,
+        semester: due.semester,
       });
 
       if (due.paymentType === "fees") {
@@ -228,30 +269,31 @@ export async function POST(request: NextRequest) {
     }
 
     batch.set(proofRef, {
-      orgId:           payload.orgId,
-      academicYear:    payload.dues[0]?.academicYear ?? "2025-2026",
-      semester:        payload.dues[0]?.semester ?? "2nd",
+      orgId: payload.orgId,
+      academicYear: payload.dues[0]?.academicYear ?? "2025-2026",
+      semester: payload.dues[0]?.semester ?? "2nd",
       userId,
-      userName:        payload.userName,
-      studentId:       payload.studentId,
-      paymentType:     payload.type,
-      paymentMethod:   payload.paymentMethod,
-      referenceId:     payload.referenceId,
+      userName: payload.userName,
+      studentId: payload.studentId,
+      paymentType: payload.type,
+      paymentMethod: payload.paymentMethod,
+      referenceId: payload.referenceId,
       referenceNumber: payload.referenceNumber ?? "",
-      senderNumber:    payload.senderNumber    ?? "",
-      amount:          payload.amount,
-      isArchived:      false,
-      imageUrl:        payload.imageUrl        ?? "",
-      status:          "pending",
-      submittedAt:     now,
+      senderNumber: payload.senderNumber ?? "",
+      ...bankDestination,
+      amount: payload.amount,
+      isArchived: false,
+      imageUrl: payload.imageUrl ?? "",
+      status: "pending",
+      submittedAt: now,
       rejectionReason: "",
-      notes:           payload.notes ?? "Public payment portal submission.",
-      verifiedBy:      null,
-      verifiedByName:  null,
-      verifiedAt:      null,
-      updatedAt:       now,
+      notes: payload.notes ?? "Public payment portal submission.",
+      verifiedBy: null,
+      verifiedByName: null,
+      verifiedAt: null,
+      updatedAt: now,
       metadata: {
-        source:      "public_payment_portal",
+        source: "public_payment_portal",
         submittedBy: "student",
         items,
       },
@@ -324,12 +366,12 @@ async function checkForBlockedDues(feeIds: string[], fineIds: string[]) {
   };
 
   const [blockedFees, blockedFines] = await Promise.all([
-    Promise.all(feeIds.map(id => isBlocked("fees",  id))),
+    Promise.all(feeIds.map(id => isBlocked("fees", id))),
     Promise.all(fineIds.map(id => isBlocked("fines", id))),
   ]);
 
   return {
-    fees:  blockedFees.filter(Boolean)  as string[],
+    fees: blockedFees.filter(Boolean) as string[],
     fines: blockedFines.filter(Boolean) as string[],
   };
 }
