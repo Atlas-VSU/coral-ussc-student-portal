@@ -13,9 +13,9 @@ export function SuccessScreen({
   submissionCount = 0,
 }: SuccessScreenProps) {
   const summary = [
-    ["Student",        form.userName],
-    ["Student ID",     form.studentId],
-    ["Amount",         `₱${parseFloat(String(form.amount)).toLocaleString()}`],
+    ["Student", form.userName],
+    ["Student ID", form.studentId],
+    ["Amount", `₱${parseFloat(String(form.amount)).toLocaleString()}`],
     ["Payment Method", form.paymentMethod.replace("_", " ")],
     ...(form.referenceNumber ? [["Reference No.", form.referenceNumber]] : []),
     ...(submissionCount > 0 ? [["Items Submitted", String(submissionCount)]] : []),
@@ -24,37 +24,30 @@ export function SuccessScreen({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-8 relative overflow-hidden font-sans">
-      {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
-
-      <Card className="w-full max-w-md border-border/50 bg-card relative z-10">
-        <CardContent className="flex flex-col items-center gap-6 p-6 sm:p-8 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <CheckCircle2 className="size-8" />
-          </div>
+      <Card className="w-full max-w-md bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 relative z-10 p-0">
+        <CardContent className="flex flex-col items-center gap-6 p-6 sm:p-8 text-center relative z-10">
 
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-bold text-primary">Payment Submitted</h2>
+            <h2 className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Payment Submitted</h2>
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Payment for{" "}
-              <span className="font-bold text-foreground">{form.userName}</span>{" "}
+              <span className="font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">{form.userName}</span>{" "}
               has been submitted and is pending review.
             </p>
           </div>
 
           <Separator className="bg-border/50" />
 
-          <div className="w-full rounded-lg bg-primary/5 border border-border p-4 text-left space-y-2">
+          <div className="w-full rounded-xl bg-white border border-brand-green/20 bg-brand-green/5 p-4 text-left space-y-2">
             {summary.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 py-1 text-sm font-medium">
-                <span className="text-muted-foreground leading-snug">{k}</span>
-                <span className="max-w-[11rem] text-right font-bold text-foreground capitalize break-words leading-snug">{v}</span>
+                <span className="text-branding-green leading-snug">{k}</span>
+                <span className="max-w-[11rem] text-right font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text capitalize break-words leading-snug">{v}</span>
               </div>
             ))}
           </div>
 
-          <Button onClick={onReset} className="w-full">
+          <Button onClick={onReset} className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white font-bold">
             Submit Another Payment
           </Button>
         </CardContent>

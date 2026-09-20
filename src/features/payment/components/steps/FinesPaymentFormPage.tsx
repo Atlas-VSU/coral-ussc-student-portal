@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, Smartphone, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -27,8 +27,9 @@ import { BankInstructions } from "../instructions/BankInstructions";
 import { SectionHeading } from "../form/SectionHeading";
 import { FieldError } from "../form/FieldError";
 import { FloatingSubmitBar } from "../form/FloatingSubmitBar";
-
+import { BackConfirmationModal } from "../BackConfirmationModal";
 import { StudentData, TermData, OrganizationData, SelectedPaymentItems, FinesPaymentFormPageProps, PublicSubmitResult, ImageData, PaymentMethodOption } from "../../types/types";
+
 export default function FinesPaymentFormPage({
   studentData,
   selectedTerm,
@@ -43,6 +44,7 @@ export default function FinesPaymentFormPage({
   const [submitResult, setSubmitResult] = useState<PublicSubmitResult | null>(null);
   const [receiptError, setReceiptError] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   const selectedFineItems = selectedPaymentItems?.fineItems.filter(f => !f.isPending) ?? [];
 
@@ -198,10 +200,10 @@ export default function FinesPaymentFormPage({
     const methods: PaymentMethodOption[] = [];
     const available = availableOnlinePaymentMethods(organizationData);
     if (available.includes("gcash")) {
-      methods.push({ value: "gcash", label: "GCash", description: "Mobile wallet" } as PaymentMethodOption);
+      methods.push({ value: "gcash", label: "GCash", description: "Mobile wallet", icon: Smartphone } as PaymentMethodOption);
     }
     if (available.includes("bank_transfer")) {
-      methods.push({ value: "bank_transfer", label: "Bank", description: "Bank / InstaPay" } as PaymentMethodOption);
+      methods.push({ value: "bank_transfer", label: "Bank", description: "Bank / InstaPay", icon: Landmark } as PaymentMethodOption);
     }
     return methods;
   }, [organizationData]);
@@ -265,182 +267,190 @@ export default function FinesPaymentFormPage({
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden font-sans">
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-brand-leaf/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-brand-green/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
-
-      <div className="mx-auto max-w-2xl px-4 py-8 pb-36 relative z-10">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 pb-8 sm:pb-36 relative overflow-hidden font-sans">
+      <div className="relative z-10 w-full max-w-2xl flex flex-col items-center">
         <PaymentBrandHeader />
-        <div className="mb-8">
+        <div className="mb-8 w-full mt-4">
           <PaymentProgressBar currentStep={currentStep} subtitle="Review payment details and submit proof of payment" />
         </div>
+        <div className="w-full">
 
-        {onBack && (
-          <Button variant="ghost" onClick={onBack} size="sm" className="mb-6 gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Fees &amp; Fines
-          </Button>
-        )}
 
-        <div className="mb-4">
-          {restoredFromDraft && (
-            <p className="text-xs text-primary font-bold">Draft restored from your previous session.</p>
-          )}
-          {lastDraftSavedAt && (
-            <p className="text-xs text-muted-foreground font-medium mt-1">
-              Draft saved at {new Date(lastDraftSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </p>
-          )}
-        </div>
 
-        {isContextualFlow && studentData && organizationData && selectedPaymentItems && (
-          <PaymentSummaryCard
-            selectedTerm={selectedTerm}
-            organizationData={organizationData}
-            selectedPaymentItems={selectedPaymentItems}
-            selectedFineItems={selectedFineItems}
-          />
-        )}
-
-        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-          <div>
-            <SectionHeading number={1} title="Student Info" />
-            <StudentInfoCard
-              userName={watch("userName")}
-              studentId={watch("studentId")}
-              userNameRegister={register("userName")}
-              studentIdRegister={register("studentId")}
-            />
+          <div className="mb-4">
+            {restoredFromDraft && (
+              <p className="text-xs text-primary font-bold">Draft restored from your previous session.</p>
+            )}
+            {lastDraftSavedAt && (
+              <p className="text-xs text-muted-foreground font-medium mt-1">
+                Draft saved at {new Date(lastDraftSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            )}
           </div>
 
-          <div className="flex flex-col">
-            <SectionHeading number={2} title="Payment Details" />
+          {isContextualFlow && studentData && organizationData && selectedPaymentItems && (
+            <PaymentSummaryCard
+              selectedTerm={selectedTerm}
+              organizationData={organizationData}
+              selectedPaymentItems={selectedPaymentItems}
+              selectedFineItems={selectedFineItems}
+            />
+          )}
 
-            {availablePaymentMethods.length === 0 ? (
-              <div className="mt-2 rounded-2xl border border-border/50 bg-amber-50 p-5 text-sm text-amber-800 font-medium">
-                <p className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  No payment methods are currently configured for this organization.
-                  Please contact your organization directly to settle this payment.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-2">
-                <PaymentMethodSelector
-                  value={watch("paymentMethod")}
-                  onSelect={handleMethodSelect}
-                  error={errors.paymentMethod?.message}
-                  methods={availablePaymentMethods}
+          <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
+            <div>
+              <SectionHeading number={1} title="Student Info" />
+              <StudentInfoCard
+                userName={watch("userName")}
+                studentId={watch("studentId")}
+                userNameRegister={register("userName")}
+                studentIdRegister={register("studentId")}
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <SectionHeading number={2} title="Payment Details" />
+
+              {availablePaymentMethods.length === 0 ? (
+                <div className="mt-2 rounded-2xl border border-border/50 bg-amber-50 p-5 text-sm text-amber-800 font-medium">
+                  <p className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    No payment methods are currently configured for this organization.
+                    Please contact your organization directly to settle this payment.
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <PaymentMethodSelector
+                    value={watch("paymentMethod")}
+                    onSelect={handleMethodSelect}
+                    error={errors.paymentMethod?.message}
+                    methods={availablePaymentMethods}
+                  />
+                </div>
+              )}
+
+              {selectedMethodAvailable && isGcash && organizationData && (
+                <GCashInstructions
+                  organizationData={organizationData}
+                  treasurerName={organizationData.orgTreasurerName || ""}
+                  treasurerNumber={configuredPaymentDetail(organizationData.orgTreasurerNumber)}
+                  auditorName={organizationData.orgAuditorName || ""}
+                  auditorNumber={configuredPaymentDetail(organizationData.orgAuditorNumber)}
+                  mobileTotal={mobileTotal}
                 />
+              )}
+
+              {selectedMethodAvailable && isBank && organizationData && (
+                <BankInstructions
+                  bankQrUrl={configuredPaymentDetail(organizationData.orgBankQrUrl)}
+                  bankAccountName={configuredPaymentDetail(organizationData.orgBankAccountName)}
+                  bankName={configuredPaymentDetail(organizationData.orgBankName)}
+                  bankAccountNumber={configuredPaymentDetail(organizationData.orgBankAccountNumber)}
+                  mobileTotal={mobileTotal}
+                />
+              )}
+
+              {availablePaymentMethods.length > 0 && (
+                <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-4">
+                  <CardContent className="px-6 sm:px-8 py-6 flex flex-col gap-4 relative z-10">
+                    <input type="hidden" {...register("amount", { valueAsNumber: true })} />
+                    <div className="rounded-xl border border-brand-green/20 bg-brand-green/5 px-4 py-3">
+                      <p className="text-xs text-branding-green font-medium">Amount</p>
+                      <p className="text-base font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text mt-0.5">₱{(Number(watch("amount") ?? 0)).toFixed(2)}</p>
+                    </div>
+                    {errors.amount && <FieldError message={errors.amount.message!} />}
+
+                    <Separator className="bg-border/50" />
+
+                    <input type="hidden" {...register("paymentMethod")} />
+                    {selectedMethodAvailable && needsRef && (
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-2">
+                        <div className="flex flex-col gap-2">
+                          <Label htmlFor="referenceNumber" className="text-brand-green font-semibold text-sm">Reference Number <span className="text-brand-green">*</span></Label>
+                          <Input id="referenceNumber" placeholder="e.g. 1234567890" {...register("referenceNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
+                          {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Label htmlFor="senderNumber" className="text-brand-green font-semibold text-sm">Sender Number <span className="text-brand-green">*</span></Label>
+                          <Input id="senderNumber" placeholder="e.g. 09123456789" {...register("senderNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
+                          {errors.senderNumber && <FieldError message={errors.senderNumber.message!} />}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {availablePaymentMethods.length > 0 && (
+              <div>
+                <SectionHeading number={3} title="Upload Receipt" />
+                <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+                  <CardContent className="px-6 sm:px-8 py-6 relative z-10">
+                    <ImageUpload
+                      value={image}
+                      onChange={(nextImage) => {
+                        setImage(nextImage);
+                        if (nextImage?.file) {
+                          setReceiptError(null);
+                        }
+                      }}
+                    />
+                    <p className="mt-3 text-xs text-muted-foreground font-medium">Receipt image is required.</p>
+                    {receiptError && <FieldError message={receiptError} />}
+                  </CardContent>
+                </Card>
               </div>
-            )}
-
-            {selectedMethodAvailable && isGcash && organizationData && (
-              <GCashInstructions
-                organizationData={organizationData}
-                treasurerName={organizationData.orgTreasurerName || ""}
-                treasurerNumber={configuredPaymentDetail(organizationData.orgTreasurerNumber)}
-                auditorName={organizationData.orgAuditorName || ""}
-                auditorNumber={configuredPaymentDetail(organizationData.orgAuditorNumber)}
-                mobileTotal={mobileTotal}
-              />
-            )}
-
-            {selectedMethodAvailable && isBank && organizationData && (
-              <BankInstructions
-                bankQrUrl={configuredPaymentDetail(organizationData.orgBankQrUrl)}
-                bankAccountName={configuredPaymentDetail(organizationData.orgBankAccountName)}
-                bankName={configuredPaymentDetail(organizationData.orgBankName)}
-                bankAccountNumber={configuredPaymentDetail(organizationData.orgBankAccountNumber)}
-                mobileTotal={mobileTotal}
-              />
             )}
 
             {availablePaymentMethods.length > 0 && (
-              <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-4">
-                <CardContent className="pt-6 flex flex-col gap-4 relative z-10">
-                  <input type="hidden" {...register("amount", { valueAsNumber: true })} />
-                  <div className="rounded-xl border border-brand-green/20 bg-brand-green/5 px-4 py-3">
-                    <p className="text-xs text-muted-foreground font-medium">Amount</p>
-                    <p className="text-base font-bold text-foreground mt-0.5">₱{(Number(watch("amount") ?? 0)).toFixed(2)}</p>
-                  </div>
-                  {errors.amount && <FieldError message={errors.amount.message!} />}
-
-                  <Separator className="bg-border/50" />
-
-                  <input type="hidden" {...register("paymentMethod")} />
-                  {selectedMethodAvailable && needsRef && (
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-2">
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="referenceNumber" className="text-brand-green font-semibold text-sm">Reference Number <span className="text-brand-green">*</span></Label>
-                        <Input id="referenceNumber" placeholder="e.g. 1234567890" {...register("referenceNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
-                        {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="senderNumber" className="text-brand-green font-semibold text-sm">Sender Number <span className="text-brand-green">*</span></Label>
-                        <Input id="senderNumber" placeholder="e.g. 09123456789" {...register("senderNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
-                        {errors.senderNumber && <FieldError message={errors.senderNumber.message!} />}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <div>
+                <SectionHeading number={4} title="Notes" optional />
+                <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+                  <CardContent className="px-6 sm:px-8 py-6 relative z-10">
+                    <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} className="rounded-2xl border-border bg-white/50 focus-visible:ring-brand-green/30 p-4" />
+                  </CardContent>
+                </Card>
+              </div>
             )}
-          </div>
 
-          {availablePaymentMethods.length > 0 && (
-            <div>
-              <SectionHeading number={3} title="Upload Receipt" />
-              <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
-                <CardContent className="pt-6 relative z-10">
-                  <ImageUpload
-                    value={image}
-                    onChange={(nextImage) => {
-                      setImage(nextImage);
-                      if (nextImage?.file) {
-                        setReceiptError(null);
-                      }
-                    }}
-                  />
-                  <p className="mt-3 text-xs text-muted-foreground font-medium">Receipt image is required.</p>
-                  {receiptError && <FieldError message={receiptError} />}
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            {submitError && (
+              <Alert variant="destructive" className="rounded-2xl border border-destructive/20 bg-destructive/10">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs font-semibold">{submitError}</AlertDescription>
+              </Alert>
+            )}
 
-          {availablePaymentMethods.length > 0 && (
-            <div>
-              <SectionHeading number={4} title="Notes" optional />
-              <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
-                <CardContent className="pt-6 relative z-10">
-                  <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} className="rounded-2xl border-border bg-white/50 focus-visible:ring-brand-green/30 p-4" />
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            {availablePaymentMethods.length > 0 && (
+              <FloatingSubmitBar
+                keyboardOffset={keyboardOffset}
+                status={status}
+                isContextualFlow={isContextualFlow}
+                feeCount={feeCount}
+                fineCount={fineCount}
+                mobileTotal={mobileTotal}
+                canSubmit={!!image?.file && selectedMethodAvailable}
+                onBack={() => setShowBackConfirm(true)}
+              />
+            )}
 
-          {submitError && (
-            <Alert variant="destructive" className="rounded-2xl border border-destructive/20 bg-destructive/10">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs font-semibold">{submitError}</AlertDescription>
-            </Alert>
-          )}
+            {availablePaymentMethods.length === 0 && (
+              <div className="flex flex-col-reverse min-[400px]:flex-row justify-end gap-3 mt-4">
+                <Button type="button" variant="outline" onClick={() => setShowBackConfirm(true)} className="w-full min-[400px]:w-auto">
+                  Back
+                </Button>
+              </div>
+            )}
 
-          {availablePaymentMethods.length > 0 && (
-            <FloatingSubmitBar
-              keyboardOffset={keyboardOffset}
-              status={status}
-              isContextualFlow={isContextualFlow}
-              feeCount={feeCount}
-              fineCount={fineCount}
-              mobileTotal={mobileTotal}
-              canSubmit={!!image?.file && selectedMethodAvailable}
-            />
-          )}
-
-        </form>
+          </form>
+        </div>
       </div>
+      <BackConfirmationModal 
+        open={showBackConfirm} 
+        onOpenChange={setShowBackConfirm} 
+        onConfirm={() => onBack?.()} 
+      />
     </div>
   );
 }
