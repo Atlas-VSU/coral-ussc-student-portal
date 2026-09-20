@@ -3,7 +3,7 @@ import { z } from "zod";
 import { adminDb } from "@/firebase/firebase-admin.config";
 import { FieldValue } from "firebase-admin/firestore";
 import { FieldPath } from "firebase-admin/firestore";
-import { availableOnlinePaymentMethods, configuredPaymentDetail } from "@/features/payment/payment-methods";
+import { availableOnlinePaymentMethods, configuredPaymentDetail } from "@/features/payment/utils/payment-methods";
 
 const unpaidDueSchema = z.object({
   refId: z.string().min(1),

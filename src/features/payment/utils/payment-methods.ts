@@ -1,4 +1,4 @@
-import type { OnlinePaymentMethod } from "./types";
+import type { OnlinePaymentMethod } from "../types/types";
 
 interface OrganizationPaymentDetails {
     orgTreasurerNumber?: unknown;

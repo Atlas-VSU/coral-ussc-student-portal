@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ConfirmationModal } from "./components/ConfirmationModal";
-import { PaymentBrandHeader } from "./components/PaymentBrandHeader";
-import { PaymentProgressBar } from "./components/PaymentProgressBar";
-import { StudentData } from "./types";
+import { ConfirmationModal } from "../ConfirmationModal";
+import { PaymentBrandHeader } from "../PaymentBrandHeader";
+import { PaymentProgressBar } from "../PaymentProgressBar";
+import { StudentData, VerificationFormData, ProgramOption, StudentVerificationPageProps } from "../../types/types";
 
 const verificationSchema = z.object({
   studentId: z
@@ -31,13 +31,6 @@ const verificationSchema = z.object({
     ),
   program: z.string().min(1, "Please select your program"),
 });
-
-type VerificationFormData = z.infer<typeof verificationSchema>;
-
-interface ProgramOption {
-  value: string;
-  label: string;
-}
 
 const FALLBACK_PROGRAM_OPTIONS: ProgramOption[] = [
   { value: "bscs", label: "Bachelor of Science in Computer Science" },
@@ -52,11 +45,6 @@ const PROGRAM_NAMES: Record<string, string> = {
   bsce: "Bachelor of Science in Civil Engineering",
   bsee: "Bachelor of Science in Electrical Engineering",
 };
-
-interface StudentVerificationPageProps {
-  onVerified: (data: StudentData) => void;
-  currentStep: 1 | 2 | 3 | 4 | 5;
-}
 
 export default function StudentVerificationPage({ onVerified, currentStep }: StudentVerificationPageProps) {
   const [showModal, setShowModal] = useState(false);
@@ -185,10 +173,6 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background Blurred Blobs */}
-      <div className="absolute top-1/4 -left-32 w-[25rem] h-[25rem] bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-[25rem] h-[25rem] bg-secondary/10 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
-
       <div className="relative z-10 w-full max-w-md flex flex-col items-center">
         <PaymentBrandHeader stepLabel="Enter your student information to continue" />
         <div className="mb-8 w-full">
@@ -197,13 +181,17 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
             subtitle="Verify your student details to continue"
           />
         </div>
-        
-        <Card className="w-full bg-card border border-border/50 p-0">
-          <CardContent className="px-4 sm:px-6 py-8">
+
+        <Card className="w-full bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
+          {/* Top-left corner accent */}
+          <div className="absolute top-0 left-0 w-20 h-3 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+          <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green pointer-events-none" />
+
+          <CardContent className="px-4 sm:px-6 py-8 relative z-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Student ID Input */}
               <div className="space-y-2">
-                <Label htmlFor="studentId" className="text-primary font-semibold text-sm">
+                <Label htmlFor="studentId" className="text-brand-green font-bold text-sm">
                   Student ID <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -217,13 +205,13 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
                     {errors.studentId.message}
                   </p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">Format: XX-X-XXXXX</p>
+                  <p className="text-xs text-brand-green/90">Format: XX-X-XXXXX</p>
                 )}
               </div>
 
               {/* Program Selection */}
               <div className="space-y-2">
-                <Label htmlFor="program" className="text-primary font-semibold text-sm">
+                <Label htmlFor="program" className="text-brand-green font-bold text-sm">
                   Program <span className="text-destructive">*</span>
                 </Label>
                 <Select
@@ -262,7 +250,7 @@ export default function StudentVerificationPage({ onVerified, currentStep }: Stu
               )}
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isVerifying}>
+              <Button type="submit" className="w-full bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white" disabled={isVerifying}>
                 {isVerifying ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
