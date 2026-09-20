@@ -52,15 +52,6 @@ export function SelfRegisterDialog({ isOpen, onOpenChange }: SelfRegisterDialogP
         <div className="absolute top-0 left-0 w-3 h-20 rounded-br-full bg-linear-to-r from-brand-leaf to-brand-green" />
 
         <DialogHeader className="items-center text-center relative z-10">
-          {!sendSuccess ? (
-            <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 mx-auto border border-brand-green/10">
-              <Mail className="w-8 h-8 text-brand-green" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 mx-auto border border-brand-green/10">
-              <CheckCircle className="w-8 h-8 text-brand-green" />
-            </div>
-          )}
           <DialogTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text w-full text-center">
             {!sendSuccess ? "Verify Your Email" : "Verification Link Sent"}
           </DialogTitle>
