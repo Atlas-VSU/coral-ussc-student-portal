@@ -30,6 +30,10 @@ import { FloatingSubmitBar } from "../form/FloatingSubmitBar";
 import { BackConfirmationModal } from "../BackConfirmationModal";
 import { StudentData, TermData, OrganizationData, SelectedPaymentItems, FinesPaymentFormPageProps, PublicSubmitResult, ImageData, PaymentMethodOption } from "../../types/types";
 
+const fieldLabelClass = "text-brand-green font-semibold text-sm";
+const fieldInputClass = "rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30";
+const fieldHintClass = "text-xs text-muted-foreground font-medium leading-snug";
+
 export default function FinesPaymentFormPage({
   studentData,
   selectedTerm,
@@ -155,7 +159,7 @@ export default function FinesPaymentFormPage({
     form,
     image, setImage,
     status,
-    needsRef, isGcash, isBank,
+    isGcash, isBank,
     handleMethodSelect,
     handleReset,
     onSubmit,
@@ -364,18 +368,33 @@ export default function FinesPaymentFormPage({
                     <Separator className="bg-border/50" />
 
                     <input type="hidden" {...register("paymentMethod")} />
-                    {selectedMethodAvailable && needsRef && (
+                    {selectedMethodAvailable && isGcash && (
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-2">
                         <div className="flex flex-col gap-2">
-                          <Label htmlFor="referenceNumber" className="text-brand-green font-semibold text-sm">Reference Number <span className="text-brand-green">*</span></Label>
-                          <Input id="referenceNumber" placeholder="e.g. 1234567890" {...register("referenceNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
+                          <Label htmlFor="referenceNumber" className={fieldLabelClass}>GCash Reference Number <span className="text-brand-green">*</span></Label>
+                          <Input id="referenceNumber" inputMode="numeric" placeholder="e.g. 1234567890123" {...register("referenceNumber")} className={fieldInputClass} />
+                          <p className={fieldHintClass}>The 10 to 13-digit number on your GCash receipt.</p>
                           {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
                         </div>
                         <div className="flex flex-col gap-2">
-                          <Label htmlFor="senderNumber" className="text-brand-green font-semibold text-sm">Sender Number <span className="text-brand-green">*</span></Label>
-                          <Input id="senderNumber" placeholder="e.g. 09123456789" {...register("senderNumber")} className="rounded-xl border-border bg-white/50 focus-visible:ring-brand-green/30" />
+                          <Label htmlFor="senderNumber" className={fieldLabelClass}>Sender Mobile Number <span className="text-brand-green">*</span></Label>
+                          <Input id="senderNumber" inputMode="tel" placeholder="e.g. 09123456789" {...register("senderNumber")} className={fieldInputClass} />
+                          <p className={fieldHintClass}>The GCash number the money was sent from.</p>
                           {errors.senderNumber && <FieldError message={errors.senderNumber.message!} />}
                         </div>
+                      </div>
+                    )}
+                    {selectedMethodAvailable && isBank && (
+                      <div className="mt-2 flex flex-col gap-2">
+                        <Label htmlFor="referenceNumber" className={fieldLabelClass}>Bank Reference Number <span className="text-brand-green">*</span></Label>
+                        <Input id="referenceNumber" placeholder="e.g. UB676547" {...register("referenceNumber")} className={fieldInputClass} />
+                        <p className={fieldHintClass}>
+                          The number labelled just <span className="font-semibold text-foreground">&quot;Reference Number&quot;</span> on
+                          your receipt. If yours also shows an{" "}
+                          <span className="font-semibold text-foreground">InstaPay</span> or{" "}
+                          <span className="font-semibold text-foreground">PESONet</span> reference, ignore it.
+                        </p>
+                        {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
                       </div>
                     )}
                   </CardContent>
