@@ -305,6 +305,7 @@ export interface FloatingSubmitBarProps {
   fineCount: number;
   mobileTotal: number;
   canSubmit: boolean;
+  onBack?: () => void;
 }
 
 export interface FieldErrorProps {
@@ -355,4 +356,14 @@ export interface FineItemCardProps {
   onToggle: (id: string) => void;
   statusLabel: string;
   statusClassName: string;
-}
+}
+
+export interface BackConfirmationModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  title?: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
+}
