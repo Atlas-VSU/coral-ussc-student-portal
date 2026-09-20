@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, AlertCircle, ArrowLeft, BookOpen, Building2, CheckCircle, Copy, CreditCard, Info, Loader2, Phone, Receipt, ShieldAlert, User, UserCircle } from "lucide-react";
+import { CalendarDays, AlertCircle, ArrowLeft, BookOpen, Building2, CheckCircle, Copy, CreditCard, Info, Landmark, Loader2, Phone, Receipt, ShieldAlert, Smartphone, User, UserCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,8 @@ import { ImageUpload } from "./components/ImageUpload";
 import { SelectedPaymentItems, StudentData, TermData, OrganizationData } from "./types";
 import { PaymentBrandHeader } from "./components/PaymentBrandHeader";
 import { PaymentProgressBar } from "./components/PaymentProgressBar";
+import { PaymentMethodSelector, type PaymentMethodOption } from "./components/PaymentMethodSelector";
+import { availableOnlinePaymentMethods, configuredPaymentDetail } from "./payment-methods";
 
 interface FinesPaymentFormPageProps {
   studentData?: StudentData;
@@ -219,7 +221,8 @@ export default function FinesPaymentFormPage({
     form,
     image, setImage,
     status,
-    needsRef, isGcash,
+    needsRef, isGcash, isBank,
+    handleMethodSelect,
     handleReset,
     onSubmit,
   } = usePaymentForm({
@@ -240,10 +243,29 @@ export default function FinesPaymentFormPage({
   const feeCount = selectedPaymentItems?.fees.length ?? 0;
   const fineCount = selectedFineItems.length ?? 0;
 
-  const treasurerName = organizationData?.orgTreasurerName || "Kleenie Elumene B. Yuzon";
-  const treasurerNumber = organizationData?.orgTreasurerNumber || "failed to load";
-  const auditorName = organizationData?.orgAuditorName || "Reniel Emberso";
-  const auditorNumber = organizationData?.orgAuditorNumber || "failed to load";
+  const treasurerName = organizationData?.orgTreasurerName || "";
+  const treasurerNumber = configuredPaymentDetail(organizationData?.orgTreasurerNumber);
+  const auditorName = organizationData?.orgAuditorName || "";
+  const auditorNumber = organizationData?.orgAuditorNumber || "";
+
+  const bankName = configuredPaymentDetail(organizationData?.orgBankName);
+  const bankAccountNumber = configuredPaymentDetail(organizationData?.orgBankAccountNumber);
+  const bankAccountName = configuredPaymentDetail(organizationData?.orgBankAccountName);
+  const bankQrUrl = configuredPaymentDetail(organizationData?.orgBankQrUrl);
+
+  // Compute which payment methods this org has actually configured.
+  // An option is only offered if the org has the required fields on file.
+  const availablePaymentMethods = useMemo(() => {
+    const methods: PaymentMethodOption[] = [];
+    const available = availableOnlinePaymentMethods(organizationData);
+    if (available.includes("gcash")) {
+      methods.push({ value: "gcash", label: "GCash", icon: Smartphone, description: "Mobile wallet" });
+    }
+    if (available.includes("bank_transfer")) {
+      methods.push({ value: "bank_transfer", label: "Bank", icon: Landmark, description: "Bank / InstaPay" });
+    }
+    return methods;
+  }, [organizationData]);
 
   useEffect(() => {
     let cancelled = false;
@@ -288,6 +310,20 @@ export default function FinesPaymentFormPage({
       cancelled = true;
     };
   }, [draftStorageKey, form, selectedPaymentItems?.totalAmount, selectedTypes, setImage, studentData?.name, studentData?.studentId]);
+
+  // Keep the selected method aligned with the current org configuration after
+  // restoring a draft. Old reference details cannot carry over to a new method.
+  useEffect(() => {
+    if (!draftRestored || availablePaymentMethods.length === 0) return;
+    const current = form.getValues("paymentMethod");
+    const isCurrentAvailable = availablePaymentMethods.some(m => m.value === current);
+    if (!isCurrentAvailable) {
+      form.setValue("paymentMethod", availablePaymentMethods[0].value, { shouldValidate: false });
+      form.setValue("referenceNumber", "");
+      form.setValue("senderNumber", "");
+      form.clearErrors(["referenceNumber", "senderNumber"]);
+    }
+  }, [draftRestored, availablePaymentMethods, form]);
 
   useEffect(() => {
     if (!draftRestored || typeof window === "undefined") return;
@@ -368,6 +404,10 @@ export default function FinesPaymentFormPage({
     handleReset();
     onRestart?.();
   };
+
+  const selectedMethodAvailable = availablePaymentMethods.some(
+    (method) => method.value === watch("paymentMethod")
+  );
 
   if (status === "success") {
     return (
@@ -455,7 +495,7 @@ export default function FinesPaymentFormPage({
               </div>
 
               {/* Payment Breakdown Row */}
-              <div className="space-y-3 rounded-xl border border-border/50 bg-card p-4">
+              <div className="space-y-3 rounded-xl border border-border/50 bg-white/50 p-4">
                 {selectedPaymentItems.feeAmount > 0 && (
                   <div className="flex items-center justify-between text-sm font-medium">
                     <span className="flex items-center gap-2">
@@ -468,7 +508,7 @@ export default function FinesPaymentFormPage({
                 {selectedPaymentItems.fineAmount > 0 && (
                   <div className="flex items-center justify-between text-sm font-medium">
                     <span className="flex items-center gap-2">
-                      <ShieldAlert className="h-4 w-4 text-destructive" />
+                      <ShieldAlert className="h-4 w-4 text-secondary" />
                       Fines ({selectedFineItems.length} item{selectedFineItems.length > 1 ? "s" : ""})
                     </span>
                     <span className="font-bold text-foreground">₱{selectedPaymentItems.fineAmount.toFixed(2)}</span>
@@ -510,8 +550,30 @@ export default function FinesPaymentFormPage({
           {/* Section 2 — Payment Details */}
           <div className="flex flex-col">
             <SectionHeading number={2} title="Payment Details" />
-            {isGcash && (
-              <Card className="mt-2 border border-secondary/20 bg-secondary/5">
+
+            {/* ── Method selector ── */}
+            {availablePaymentMethods.length === 0 ? (
+              <div className="mt-2 rounded-2xl border border-border/50 bg-amber-50 p-5 text-sm text-amber-800 font-medium">
+                <p className="flex items-center gap-2">
+                  <Info className="h-4 w-4 shrink-0" />
+                  No payment methods are currently configured for this organization.
+                  Please contact your organization directly to settle this payment.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-2">
+                <PaymentMethodSelector
+                  value={watch("paymentMethod")}
+                  onSelect={handleMethodSelect}
+                  error={errors.paymentMethod?.message}
+                  methods={availablePaymentMethods}
+                />
+              </div>
+            )}
+
+            {/* ── GCash instructions ── (unchanged, shown only when gcash is selected) */}
+            {selectedMethodAvailable && isGcash && (
+              <Card className="mt-4 border border-secondary/20 bg-secondary/5 shadow-soft">
                 <CardContent className="pt-6 flex flex-col items-center gap-6">
                   <p className="text-xs text-muted-foreground self-start flex items-center gap-1.5 font-medium">
                     <CreditCard className="h-4 w-4 text-secondary" />
@@ -519,7 +581,7 @@ export default function FinesPaymentFormPage({
                   </p>
 
                   {/* QR Code Section */}
-                  <div className="border border-border/50 bg-white p-3 rounded-xl shadow-sm">
+                  <div className="border border-border/50 bg-white p-3 rounded-2xl shadow-soft">
                     <img
                       src={organizationData?.orgTreasurerUrl || "/images/public-student-payment/404-QRNOTFOUND.png"}
                       alt={`${treasurerName} GCash Payment QR Code`}
@@ -528,20 +590,20 @@ export default function FinesPaymentFormPage({
                   </div>
 
                   {/* GCash Account Details */}
-                  <div className="w-full bg-card rounded-xl p-5 border border-border shadow-sm">
+                  <div className="w-full bg-white/90 rounded-2xl p-5 border border-border shadow-soft">
                     <h4 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <Phone className="h-4 w-4 text-secondary" />
                       Treasurer GCash Details
                     </h4>
                     <div className="space-y-4">
-                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-lg min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-secondary" />
                           <span className="text-xs md:text-sm text-muted-foreground font-medium">Treasurer Name:</span>
                         </div>
                         <span className="font-bold text-sm md:text-base break-words text-left min-[430px]:text-right text-foreground">{treasurerName}</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-lg min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                      <div className="flex flex-col gap-1 p-3 bg-secondary/5 border border-secondary/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-secondary" />
                           <span className="text-xs md:text-sm text-muted-foreground font-medium">GCash Number:</span>
@@ -565,21 +627,21 @@ export default function FinesPaymentFormPage({
                           <Button
                             type="button"
                             variant="outline"
-                            className="h-auto w-full whitespace-normal py-3 text-xs leading-snug sm:text-sm"
+                            className="h-auto w-full whitespace-normal py-3 text-xs leading-snug border-secondary/30 text-secondary hover:bg-secondary/10 sm:text-sm"
                           >
                             Use alternative payment account (Auditor)
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="w-[calc(100%-1.5rem)] max-w-md bg-card text-foreground border border-border/50 p-8 overflow-hidden">
+                        <DialogContent className="w-[calc(100%-1.5rem)] max-w-md bg-card text-foreground border border-border/50 rounded-[2rem] p-8 shadow-float overflow-hidden">
                           <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold">Alternative GCash Account</DialogTitle>
+                            <DialogTitle className="text-2xl font-bold font-serif">Alternative GCash Account</DialogTitle>
                             <DialogDescription className="text-sm text-muted-foreground font-medium">
                               Use the auditor account only if the treasurer account is unavailable.
                             </DialogDescription>
                           </DialogHeader>
 
                           <div className="space-y-6">
-                            <div className="relative mx-auto max-h-56 w-auto rounded-xl border border-border bg-white p-3 overflow-hidden shadow-sm flex items-center justify-center">
+                            <div className="relative mx-auto max-h-56 w-auto rounded-2xl border border-border bg-white p-3 overflow-hidden shadow-soft flex items-center justify-center">
                               <img
                                 src={organizationData?.orgAuditorUrl || "/images/public-student-payment/404-QRNOTFOUND.png"}
                                 alt={`${auditorName} GCash Payment QR Code`}
@@ -587,7 +649,7 @@ export default function FinesPaymentFormPage({
                               />
                             </div>
 
-                            <div className="rounded-xl border border-border bg-secondary/5 p-4 space-y-3">
+                            <div className="rounded-2xl border border-border bg-secondary/5 p-4 space-y-3 shadow-soft">
                               <div className="flex flex-col gap-1 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between min-[430px]:gap-2">
                                 <span className="text-xs text-muted-foreground font-medium">Auditor Name:</span>
                                 <span className="text-sm font-bold text-foreground break-words text-left min-[430px]:text-right">{auditorName}</span>
@@ -651,10 +713,10 @@ export default function FinesPaymentFormPage({
                   </div>
 
                   {/* Important Reminder */}
-                  <div className="w-full bg-warning-muted border border-warning rounded-lg p-4">
+                  <div className="w-full bg-secondary/5 border border-secondary/20 rounded-[1.5rem] p-4 shadow-soft">
                     <p className="text-xs flex items-start gap-2.5 font-medium leading-relaxed">
                       <span className="text-muted-foreground">
-                        <span className="font-bold text-warning-foreground">Important:</span>{' '}
+                        <span className="font-bold text-secondary">Important:</span>{' '}
                         Save your GCash reference number. Take a screenshot of the confirmation page and send it to our support for faster verification.
                       </span>
                     </p>
@@ -666,10 +728,111 @@ export default function FinesPaymentFormPage({
                     Save your reference number for verification
                   </p>
                 </CardContent>
+            {/* ── Bank Transfer instructions ── (shown only when bank_transfer is selected) */}
+            {selectedMethodAvailable && isBank && (
+              <Card className="mt-4 border border-brand-green/20 bg-brand-green/5 shadow-soft">
+                <CardContent className="pt-6 flex flex-col items-center gap-6">
+                  <p className="text-xs text-muted-foreground self-start flex items-center gap-1.5 font-medium">
+                    <Landmark className="h-4 w-4 text-brand-green" />
+                    Pay via bank transfer using InstaPay or PESONet
+                  </p>
+
+
+                  {/* QR Code Section */}
+                  {bankQrUrl && (
+                    <div className="border border-border/50 bg-white p-3 rounded-2xl shadow-soft">
+                      <img
+                        src={bankQrUrl}
+                        alt={`${bankAccountName} Bank QR Ph Code`}
+                        className="max-h-72 w-auto object-contain rounded-xl"
+                      />
+                    </div>
+                  )}
+
+                  {/* Bank Account Details */}
+                  <div className="w-full bg-white/90 rounded-2xl p-5 border border-border shadow-soft">
+                    <h4 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                      <Landmark className="h-4 w-4 text-brand-green" />
+                      Bank Account Details
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-1 p-3 bg-brand-green/5 border border-brand-green/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-brand-green" />
+                          <span className="text-xs md:text-sm text-muted-foreground font-medium">Bank:</span>
+                        </div>
+                        <span className="font-bold text-sm md:text-base text-foreground">{bankName}</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 bg-brand-green/5 border border-brand-green/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-brand-green" />
+                          <span className="text-xs md:text-sm text-muted-foreground font-medium">Account Name:</span>
+                        </div>
+                        <span className="font-bold text-sm md:text-base break-words text-left min-[430px]:text-right text-foreground">{bankAccountName}</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 bg-brand-green/5 border border-brand-green/10 rounded-xl min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="h-4 w-4 text-brand-green" />
+                          <span className="text-xs md:text-sm text-muted-foreground font-medium">Account Number:</span>
+                        </div>
+                        <div className="flex w-full items-center justify-between gap-2 min-[430px]:w-auto min-[430px]:justify-end">
+                          <span className="font-bold text-sm md:text-base text-foreground">{bankAccountNumber}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void navigator.clipboard.writeText(bankAccountNumber);
+                              toast.success("Copied to clipboard!");
+                            }}
+                            className="p-1.5 hover:bg-brand-green/10 rounded-full transition-colors cursor-pointer"
+                          >
+                            <Copy className="h-3.5 w-3.5 text-brand-green" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Steps */}
+                  <div className="w-full space-y-4">
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <Info className="h-4 w-4 text-brand-green" />
+                      How to pay via Bank Transfer:
+                    </h4>
+                    <div className="space-y-2 bg-card border border-border rounded-xl p-4 shadow-sm">
+                      <p className="text-xs font-bold text-brand-green uppercase tracking-wider">Via InstaPay / PESONet</p>
+                      <ol className="space-y-1.5 pl-5 list-decimal text-xs text-muted-foreground font-medium">
+                        <li>Open your bank&apos;s app (BDO, BPI, UnionBank, etc.)</li>
+                        <li>Go to <span className="font-bold text-foreground">Transfer → InstaPay</span> or <span className="font-bold text-foreground">PESONet</span></li>
+                        <li>Enter the account number: <span className="font-bold text-foreground">{bankAccountNumber}</span></li>
+                        <li>Verify the account name: <span className="font-bold text-foreground">{bankAccountName}</span></li>
+                        <li>Enter the amount: <span className="font-bold text-foreground">₱{mobileTotal}</span></li>
+                        <li>Add your Student ID in the remarks/notes (Optional)</li>
+                        <li>Confirm the transfer and <span className="font-bold text-foreground">save your reference number</span></li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* Important Reminder */}
+                  <div className="w-full bg-brand-green/5 border border-brand-green/20 rounded-[1.5rem] p-4 shadow-soft">
+                    <p className="text-xs flex items-start gap-2.5 font-medium leading-relaxed">
+                      <span className="text-muted-foreground">
+                        <span className="font-bold text-brand-green">Important:</span>{' '}
+                        Save your bank transfer reference number. Take a screenshot of the confirmation and upload it below for faster verification.
+                      </span>
+                    </p>
+                  </div>
+
+                  <p className="font-bold text-brand-green mt-2 flex items-center justify-center gap-2 text-sm md:text-base text-center">
+                    <CheckCircle className="h-5 w-5" />
+                    Save your reference number for verification
+                  </p>
+                </CardContent>
               </Card>
             )}
-            <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-4">
-              <CardContent className="pt-6 flex flex-col gap-4 relative z-10">
+
+            {availablePaymentMethods.length > 0 && <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative mt-4">
+              <CardContent className="pt-6 flex flex-col gap-4 relative z-10">>
+>>>>>>> aa5b92e6dc77220940857e18c2edb2944cfb286a
                 <input type="hidden" {...register("amount", { valueAsNumber: true })} />
                 <div className="rounded-xl border border-brand-green/20 bg-brand-green/5 px-4 py-3">
                   <p className="text-xs text-muted-foreground font-medium">Amount</p>
@@ -680,17 +843,16 @@ export default function FinesPaymentFormPage({
                 <Separator className="bg-border/50" />
 
                 <input type="hidden" {...register("paymentMethod")} />
-                <div className="rounded-xl border border-brand-green/20 bg-brand-green/5 px-4 py-3">
-                  <p className="text-xs text-muted-foreground font-medium">Payment Method</p>
-                  <p className="text-sm font-bold text-foreground mt-0.5">GCash</p>
-                </div>
-                {errors.paymentMethod && <FieldError message={errors.paymentMethod.message!} />}
-                {needsRef && (
+                {selectedMethodAvailable && needsRef && (
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-2">
                     <div className="flex flex-col gap-2">
                       <Label htmlFor="referenceNumber" className="text-brand-green font-semibold text-sm">Reference Number <span className="text-brand-green">*</span></Label>
-                      <Input id="referenceNumber" placeholder="e.g. 1234567890" {...register("referenceNumber")}
-                        className={errors.referenceNumber ? "border-destructive focus-visible:ring-destructive/30" : ""} />
+                      <Input
+                        id="referenceNumber"
+                        placeholder={isBank ? "e.g. INSTAPAY-20260919-XXXXXX" : "e.g. 1234567890"}
+                        {...register("referenceNumber")}
+                        className={errors.referenceNumber ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                      />
                       {errors.referenceNumber && <FieldError message={errors.referenceNumber.message!} />}
                     </div>
                     {isGcash && (
@@ -704,12 +866,12 @@ export default function FinesPaymentFormPage({
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </Card>}
 
           </div>
 
           {/* Section 3 — Upload Receipt */}
-          <div>
+          {availablePaymentMethods.length > 0 && <div>
             <SectionHeading number={3} title="Upload Receipt" />
             <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
               <CardContent className="pt-6 relative z-10">
@@ -726,28 +888,28 @@ export default function FinesPaymentFormPage({
                 {receiptError && <FieldError message={receiptError} />}
               </CardContent>
             </Card>
-          </div>
+          </div>}
 
           {/* Section 4 — Notes */}
-          <div>
+          {availablePaymentMethods.length > 0 && <div>
             <SectionHeading number={4} title="Notes" optional />
             <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
               <CardContent className="pt-6 relative z-10">
-                <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} />
+                <Textarea id="notes" placeholder="Any additional notes or remarks..." {...register("notes")} rows={3} className="rounded-2xl border-border bg-white/50 focus-visible:ring-brand-green/30 p-4" />
               </CardContent>
             </Card>
-          </div>
+          </div>}
 
           {submitError && (
-            <Alert variant="destructive" className="border border-destructive/20 bg-destructive/10">
+            <Alert variant="destructive" className="rounded-2xl border border-destructive/20 bg-destructive/10">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-xs font-semibold">{submitError}</AlertDescription>
             </Alert>
           )}
 
           {/* Bottom Floating Bar */}
-          <div
-            className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-background/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-lg"
+          {availablePaymentMethods.length > 0 && <div
+            className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-[#FDFCF8]/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-float"
             style={{ bottom: keyboardOffset > 0 ? `${keyboardOffset}px` : 0 }}
           >
             <div className="mx-auto max-w-2xl">
@@ -767,7 +929,7 @@ export default function FinesPaymentFormPage({
                   </div>
                   <Button
                     type="submit"
-                    disabled={!image?.file}
+                    disabled={!image?.file || !selectedMethodAvailable}
                     className="px-8 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
                   >
                     Submit Payment
@@ -775,7 +937,7 @@ export default function FinesPaymentFormPage({
                 </div>
               )}
             </div>
-          </div>
+          </div>}
 
         </form>
       </div>
