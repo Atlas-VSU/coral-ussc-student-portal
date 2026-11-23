@@ -30,6 +30,10 @@ export default function OrganizationSelectionPage({
   const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   const isOrganizationPayable = (organization: OrganizationData) => {
+    if (organization.isAcceptingPayments === false) {
+      return false;
+    }
+
     if (organization.outstandingAmount > 0) {
       return true;
     }
