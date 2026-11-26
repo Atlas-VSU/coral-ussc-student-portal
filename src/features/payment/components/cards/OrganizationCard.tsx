@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Building2, ChevronRight } from "lucide-react";
-import { OrganizationData, OrganizationCardProps } from "../../types/types";
+import { OrganizationCardProps } from "../../types/types";
 import { useState } from "react";
 
 const getStatusBadge = (status: "unpaid" | "pending" | "rejected" | "verified" | "cleared") => {
@@ -53,14 +53,11 @@ export function OrganizationCard({ org, isSelected, isPayable, onSelect }: Organ
   return (
     <button
       onClick={() => onSelect(org.id)}
-      disabled={!isPayable}
-      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-start justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer ${isPayable
-          ? "hover:border-brand-green/50 hover:bg-brand-green/5"
-          : "opacity-70 cursor-not-allowed"
-        } ${isSelected && isPayable
+      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-300 flex items-start justify-between gap-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer hover:border-brand-green/50 hover:bg-brand-green/5 ${
+        isSelected
           ? "border-brand-green bg-brand-green/5 shadow-sm"
           : "border-border bg-white"
-        }`}
+      }`}
     >
       <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
         {org.orgLogoUrl && !failedLogo ? (
@@ -112,10 +109,11 @@ export function OrganizationCard({ org, isSelected, isPayable, onSelect }: Organ
               Outstanding Balance:
             </span>
             <span
-              className={`text-base font-bold ${org.outstandingAmount > 0
+              className={`text-base font-bold ${
+                org.outstandingAmount > 0
                   ? "text-destructive"
                   : "text-primary"
-                }`}
+              }`}
             >
               ₱{org.outstandingAmount.toFixed(2)}
             </span>
@@ -132,15 +130,16 @@ export function OrganizationCard({ org, isSelected, isPayable, onSelect }: Organ
           {!isPayable && (
             <p className={`mt-2 text-xs font-medium ${org.isAcceptingPayments === false ? "text-amber-700" : "text-muted-foreground"}`}>
               {org.isAcceptingPayments === false
-                ? "Online payments are temporarily disabled by this organization."
-                : "No payment needed for now. Current submissions are pending or already verified."}
+                ? "Online payments are temporarily disabled by this organization. You can still select this organization to view your records and receipts."
+                : "No payment needed for now. Select this organization to view your payment records and receipts."}
             </p>
           )}
         </div>
       </div>
       <ChevronRight
-        className={`mt-2 hidden h-5 w-5 shrink-0 min-[400px]:block transition-transform duration-300 ${isSelected && isPayable ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
-          }`}
+        className={`mt-2 hidden h-5 w-5 shrink-0 min-[400px]:block transition-transform duration-300 ${
+          isSelected ? "text-brand-green translate-x-0.5" : "text-muted-foreground"
+        }`}
       />
     </button>
   );
