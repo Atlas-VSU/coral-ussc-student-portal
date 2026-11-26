@@ -64,6 +64,28 @@ export interface OrganizationDueData extends OrganizationData {
  *  API has always returned it, so any narrowing on this union was unsound. */
 export type PaymentState = "unpaid" | "pending" | "rejected" | "verified";
 
+export interface StudentReceiptItem {
+  name: string;
+  type: "fees" | "fines";
+  amount: number;
+}
+
+export interface StudentReceiptData {
+  receiptId: string;
+  studentName: string;
+  studentId: string;
+  orgName: string;
+  orgAcronym: string;
+  orgLogoUrl?: string | null;
+  items: StudentReceiptItem[];
+  total: number;
+  date: string;
+  verifiedByName: string;
+  paymentMethod: string;
+  AY: string;
+  semester: string;
+}
+
 export interface FeeItem {
   id: string;
   description: string;
@@ -75,6 +97,8 @@ export interface FeeItem {
   academicYear?: string;
   semester?: string;
   paymentState?: PaymentState;
+  paidAmount?: number;
+  receipt?: StudentReceiptData;
 }
 
 export interface FineItem {
@@ -91,6 +115,8 @@ export interface FineItem {
   semester?: string;
   /** Derived per item from its own flags — never inherited from the parent fine. */
   paymentState?: PaymentState;
+  paidAmount?: number;
+  receipt?: StudentReceiptData;
   isPayable?: boolean;
   /** Present only when THIS item was part of the declined submission. */
   latestRejectionReason?: string;
@@ -105,6 +131,8 @@ export interface Fine {
   latestRejectionReason?: string;
   isPayable?: boolean;
   paymentState?: PaymentState;
+  paidAmount?: number;
+  receipt?: StudentReceiptData;
 }
 
 export interface SelectedPaymentItems {
