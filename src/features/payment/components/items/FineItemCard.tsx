@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { FineItem, Fine, FineItemCardProps } from "../../types/types";
+import { FineItemCardProps } from "../../types/types";
 
 const formatDisplayDate = (value?: unknown) => {
   if (!value) return null;
@@ -47,12 +47,13 @@ export function FineItemCard({
           onToggle(fine.refId);
         }
       }}
-      className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${!isSelectable
+      className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
+        !isSelectable
           ? "bg-muted/40 border-border/50"
           : isSelected
             ? "bg-destructive/10 border-destructive cursor-pointer"
             : "bg-card border-border hover:bg-destructive/5 cursor-pointer"
-        }`}
+      }`}
     >
       <Checkbox
         checked={isSelected}
@@ -82,7 +83,15 @@ export function FineItemCard({
         )}
         {fine.isPaid && !fine.isPending && (
           <p className="text-xs text-success font-medium">
-            {fine.isWaived ? "Waived by the organization" : "Settled"}
+            {fine.isWaived ? (
+              "Waived by the organization"
+            ) : fine.receipt ? (
+              <>
+                Settled · <span className="font-mono">Receipt #{fine.receipt.receiptId}</span>
+              </>
+            ) : (
+              "Settled"
+            )}
           </p>
         )}
         {fine.latestRejectionReason && !fine.isPending && (

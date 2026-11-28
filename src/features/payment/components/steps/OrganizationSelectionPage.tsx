@@ -23,8 +23,6 @@ export default function OrganizationSelectionPage({
   selectedTerm,
 }: OrganizationSelectionPageProps) {
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
-  // A logo URL can be stale or unreachable; falling back to the icon keeps the
-  // row from rendering a broken image.
   const [failedLogos, setFailedLogos] = useState<Set<string>>(new Set());
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
@@ -47,11 +45,12 @@ export default function OrganizationSelectionPage({
     return states.includes("unpaid") || states.includes("rejected");
   };
 
-  const hasPayableOrganizations = organizations.some((organization) => isOrganizationPayable(organization));
+  const selectedOrganization = organizations.find((org) => org.id === selectedOrg) || null;
+  const isSelectedOrgPayable = selectedOrganization ? isOrganizationPayable(selectedOrganization) : false;
 
   const handleOrgSelect = (orgId: string) => {
     const org = organizations.find((organization) => organization.id === orgId);
-    if (!org || !isOrganizationPayable(org)) {
+    if (!org) {
       return;
     }
 
@@ -61,16 +60,13 @@ export default function OrganizationSelectionPage({
   const handleContinue = async () => {
     if (isAdvancing) return;
 
-    if (!hasPayableOrganizations) {
+    if (organizations.length === 0) {
       onBack();
       return;
     }
 
     if (!selectedOrg) return;
 
-    // Awaited even though the parent is currently synchronous: if it ever
-    // starts fetching before advancing, the button reports it instead of
-    // going dead. A synchronous handler resolves immediately and shows nothing.
     setIsAdvancing(true);
     try {
       await onNext(selectedOrg);
@@ -90,8 +86,6 @@ export default function OrganizationSelectionPage({
           />
         </div>
         <div className="w-full space-y-8">
-
-
           {/* Term & Student Info Banner Card */}
           <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
             <CardContent className="px-4 sm:px-6 py-4 space-y-4 relative z-10">
@@ -144,7 +138,7 @@ export default function OrganizationSelectionPage({
             <CardHeader className="px-6 sm:px-8 pt-8 pb-2 relative z-10">
               <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-brand-leaf to-brand-green text-transparent bg-clip-text">Select Organization</CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
-                Choose the organization you want to pay fees or fines for
+                Choose the organization you want to pay fees or fines for, or view your payment receipts
               </CardDescription>
             </CardHeader>
             <CardContent className="px-6 sm:px-8 pb-8 pt-4">
@@ -180,7 +174,7 @@ export default function OrganizationSelectionPage({
             </Button>
             <Button
               onClick={handleContinue}
-              disabled={isLoading || isAdvancing || organizations.length === 0 || (hasPayableOrganizations && !selectedOrg)}
+              disabled={isLoading || isAdvancing || organizations.length === 0 || !selectedOrg}
               className="w-full min-[400px]:w-auto gap-2 bg-linear-to-r from-brand-leaf to-brand-green hover:brightness-105 border-0 text-white"
             >
               {isAdvancing ? (
@@ -190,7 +184,11 @@ export default function OrganizationSelectionPage({
                 </>
               ) : (
                 <>
-                  {hasPayableOrganizations ? "Continue to Payment Selection" : "Exit"}
+                  {organizations.length === 0
+                    ? "Exit"
+                    : !selectedOrganization || isSelectedOrgPayable
+                      ? "Continue to Payment Selection"
+                      : "View Records & Receipts"}
                 </>
               )}
             </Button>
