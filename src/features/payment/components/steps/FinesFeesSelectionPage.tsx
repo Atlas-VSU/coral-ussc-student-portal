@@ -9,10 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import { CalendarDays, ArrowLeft, BookOpen, Building2, Receipt, AlertCircle, CheckCircle2, Loader2, UserCircle } from "lucide-react";
 import { PaymentBrandHeader } from "../PaymentBrandHeader";
 import { PaymentProgressBar } from "../PaymentProgressBar";
-import { StudentData, TermData, OrganizationData, FeeItem, Fine, FineItem, FinesFeesSelectionPageProps } from "../../types/types";
+import { OfficialReceiptsCard } from "../cards/OfficialReceiptsCard";
+import { StudentReceiptDialog } from "../StudentReceiptDialog";
+import { deduplicateReceipts } from "../../utils/receipt-print";
+import { StudentData, TermData, OrganizationData, FeeItem, Fine, FineItem, FinesFeesSelectionPageProps, StudentReceiptData } from "../../types/types";
 import { FeeItemCard } from "../items/FeeItemCard";
 import { FineItemCard } from "../items/FineItemCard";
 import { BackConfirmationModal } from "../BackConfirmationModal";
+
 export default function FinesFeesSelectionPage({
   studentData,
   organizationData,
@@ -25,12 +29,17 @@ export default function FinesFeesSelectionPage({
   onNext,
   selectedTerm,
 }: FinesFeesSelectionPageProps) {
-  // Selection is per item. It used to be two all-or-nothing switches, so a
-  // student who could only afford one fine had to pay every fine at once.
   const [selectedFeeIds, setSelectedFeeIds] = useState<Set<string>>(new Set());
   const [selectedFineItemIds, setSelectedFineItemIds] = useState<Set<string>>(new Set());
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
+  const [activeReceipt, setActiveReceipt] = useState<StudentReceiptData | null>(null);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+
+  const handleOpenReceipt = (receipt: StudentReceiptData) => {
+    setActiveReceipt(receipt);
+    setReceiptDialogOpen(true);
+  };
 
   const toggleId = (setter: React.Dispatch<React.SetStateAction<Set<string>>>) =>
     (id: string) =>
@@ -75,35 +84,7 @@ export default function FinesFeesSelectionPage({
     };
   };
 
-  const formatDisplayDate = (value?: unknown) => {
-    if (!value) return null;
-
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      "_seconds" in value &&
-      typeof (value as { _seconds?: unknown })._seconds === "number"
-    ) {
-      const seconds = (value as { _seconds: number })._seconds;
-      return new Date(seconds * 1000).toLocaleDateString();
-    }
-
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value.toLocaleDateString();
-    }
-
-    if (typeof value !== "string") return null;
-
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return value;
-    return parsed.toLocaleDateString();
-  };
-
   const payableFees = useMemo(() => fees.filter((fee) => fee.isPayable !== false), [fees]);
-  // `isPayable` is computed per item on the server from that item's own flags.
-  // Filtering on `!isPending` alone counted settled items as payable now that
-  // the API returns them, so the student could see paid fines offered for
-  // payment again.
   const activeFineItems = useMemo(
     () => fineItems.filter((fine) => !fine.isArchived),
     [fineItems]
@@ -115,9 +96,6 @@ export default function FinesFeesSelectionPage({
   const pendingFines = useMemo(() => activeFineItems.filter((fine) => fine.isPending === true), [activeFineItems]);
   const payableFines = useMemo(() => payableFineItems.length > 0 ? fines : [], [fines, payableFineItems]);
 
-  // The card headers show what is still OWED. They used to sum every row
-  // including settled ones, so the header total silently disagreed with the
-  // "Pay All" figure directly beneath it with nothing to explain the gap.
   const feesTotal = useMemo(() => {
     return payableFees.reduce((sum, fee) => sum + fee.amount, 0);
   }, [payableFees]);
@@ -126,7 +104,6 @@ export default function FinesFeesSelectionPage({
     return payableFineItems.reduce((sum, fine) => sum + fine.amount, 0);
   }, [payableFineItems]);
 
-  // ── What the student has actually ticked ──────────────────────────────────
   const selectedFees = useMemo(
     () => payableFees.filter((fee) => selectedFeeIds.has(fee.id)),
     [payableFees, selectedFeeIds]
@@ -151,9 +128,6 @@ export default function FinesFeesSelectionPage({
     return new Map(fines.map((fine) => [fine.id, fine]));
   }, [fines]);
 
-  // Only the parent fines the chosen items actually belong to — the payment
-  // step reads this list, so carrying unrelated fines through would attach the
-  // wrong parent to the submission.
   const selectedParentFines = useMemo(() => {
     const parentIds = new Set(selectedFineItems.map((item) => item.parentFineId));
     return fines.filter((fine) => parentIds.has(fine.id));
@@ -165,8 +139,6 @@ export default function FinesFeesSelectionPage({
     if (isAdvancing) return;
     if (selectedFees.length === 0 && selectedFineItems.length === 0) return;
 
-    // Awaited so the button reports progress rather than going dead if the
-    // parent ever loads anything before advancing.
     setIsAdvancing(true);
     try {
       await onNext({
@@ -182,18 +154,17 @@ export default function FinesFeesSelectionPage({
     }
   };
 
-  // A student the roster sync has retired is no longer enrolled, so their
-  // records are history to review rather than dues to settle. Nothing here is
-  // selectable, and `submit-payment` refuses them server-side regardless.
-  const isViewOnly = studentData.isArchived === true;
+  const isRetiredStudent = studentData.isArchived === true;
+  const isOrgPaymentsPaused = organizationData.isAcceptingPayments === false;
+  const isViewOnly = isRetiredStudent || isOrgPaymentsPaused;
 
   const hasSelection =
     !isViewOnly && (selectedFees.length > 0 || selectedFineItems.length > 0);
   const selectedCount = selectedFees.length + selectedFineItems.length;
   const hasPayableFees = !isViewOnly && payableFees.length > 0;
   const hasPayableFineItems = !isViewOnly && payableFineItems.length > 0;
+  const hasAnyPayableItems = hasPayableFees || hasPayableFineItems;
 
-  // ── Select-all helpers, kept so paying everything is still one click ───────
   const allFeesSelected = hasPayableFees && selectedFees.length === payableFees.length;
   const allFinesSelected =
     hasPayableFineItems && selectedFineItems.length === payableFineItems.length;
@@ -206,6 +177,11 @@ export default function FinesFeesSelectionPage({
       checked ? new Set(payableFineItems.map((item) => item.refId)) : new Set()
     );
 
+  const uniqueReceipts = useMemo(
+    () => deduplicateReceipts(fees, activeFineItems),
+    [fees, activeFineItems]
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 pb-8 sm:pb-36 relative overflow-hidden font-sans">
       <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
@@ -217,8 +193,6 @@ export default function FinesFeesSelectionPage({
           />
         </div>
         <div className="w-full space-y-8">
-
-
           {/* Term, Student & Organization Info Banner Card */}
           <Card className="bg-white text-foreground rounded-2xl drop-shadow-[4px_4px_0px_rgba(139,195,74,0.1)] border border-brand-green/20 p-0 overflow-hidden relative">
             <CardContent className="px-4 sm:px-6 py-5 space-y-4 relative z-10">
@@ -275,7 +249,7 @@ export default function FinesFeesSelectionPage({
             </CardContent>
           </Card>
 
-          {isViewOnly && (
+          {isRetiredStudent && (
             <Card className="border-warning bg-warning-muted">
               <CardContent className="px-4 sm:px-6 py-4">
                 <p className="text-sm font-bold text-warning-foreground">
@@ -289,6 +263,25 @@ export default function FinesFeesSelectionPage({
               </CardContent>
             </Card>
           )}
+
+          {!isRetiredStudent && isOrgPaymentsPaused && (
+            <Card className="border-warning bg-warning-muted">
+              <CardContent className="px-4 sm:px-6 py-4">
+                <p className="text-sm font-bold text-warning-foreground">
+                  Online payments are temporarily disabled by this organization
+                </p>
+                <p className="text-xs text-warning-foreground font-medium mt-0.5">
+                  You can review your fee and fine records and view or download receipts for
+                  approved payments below, but new online payment submissions are currently paused.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          <OfficialReceiptsCard
+            receipts={uniqueReceipts}
+            onViewReceipt={handleOpenReceipt}
+          />
 
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Fees Section */}
@@ -310,12 +303,13 @@ export default function FinesFeesSelectionPage({
                 {fees.length > 0 && (
                   <>
                     <div
-                      className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${allFeesSelected
-                        ? "bg-brand-green/10 border-brand-green shadow-sm"
-                        : hasPayableFees
-                          ? "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
-                          : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
-                        }`}
+                      className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
+                        allFeesSelected
+                          ? "bg-brand-green/10 border-brand-green shadow-sm"
+                          : hasPayableFees
+                            ? "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
+                            : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
+                      }`}
                       onClick={() => {
                         if (!hasPayableFees) return;
                         toggleAllFees(!allFeesSelected);
@@ -330,7 +324,6 @@ export default function FinesFeesSelectionPage({
                           toggleAllFees(checked === true);
                         }}
                         onClick={(e) => e.stopPropagation()}
-
                       />
                       <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                         Select All Fees
@@ -346,7 +339,7 @@ export default function FinesFeesSelectionPage({
                     </div>
                     {!hasPayableFees && (
                       <p className="text-xs text-warning-foreground px-1 font-medium">
-                        {fees.some(f => f.paymentState === "pending")
+                        {fees.some((f) => f.paymentState === "pending")
                           ? "All fee items are currently pending verification or verified and cannot be selected."
                           : "All fee items are already verified and cannot be selected."}
                       </p>
@@ -405,12 +398,13 @@ export default function FinesFeesSelectionPage({
                 {(pendingFines.length > 0 || payableFines.length > 0) && (
                   <>
                     <div
-                      className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${allFinesSelected
-                        ? "bg-destructive/10 border-destructive shadow-sm"
-                        : hasPayableFineItems
-                          ? "bg-card border-border hover:bg-destructive/5 cursor-pointer"
-                          : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
-                        }`}
+                      className={`flex flex-wrap items-center gap-x-3 gap-y-2 p-3 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
+                        allFinesSelected
+                          ? "bg-destructive/10 border-destructive shadow-sm"
+                          : hasPayableFineItems
+                            ? "bg-card border-border hover:bg-destructive/5 cursor-pointer"
+                            : "bg-muted/30 border-border opacity-70 cursor-not-allowed"
+                      }`}
                       onClick={() => {
                         if (!hasPayableFineItems) return;
                         toggleAllFineItems(!allFinesSelected);
@@ -426,7 +420,6 @@ export default function FinesFeesSelectionPage({
                           toggleAllFineItems(checked === true);
                         }}
                         onClick={(e) => e.stopPropagation()}
-
                       />
                       <span className="text-sm font-bold leading-snug flex-1 min-w-0 text-foreground">
                         Select All Fines
@@ -442,7 +435,7 @@ export default function FinesFeesSelectionPage({
                     </div>
                     {!hasPayableFineItems && (
                       <p className="text-xs text-warning-foreground px-1 font-medium">
-                        {activeFineItems.some(f => f.isPending)
+                        {activeFineItems.some((f) => f.isPending)
                           ? "All fine items are currently pending verification or verified and cannot be selected."
                           : "All fine items are already verified and cannot be selected."}
                       </p>
@@ -456,11 +449,6 @@ export default function FinesFeesSelectionPage({
                 <div className="space-y-3">
                   {activeFineItems.map((fine) => {
                     const parentFine = fineById.get(fine.parentFineId);
-                    // The item's own state, computed server-side from its own
-                    // flags. It used to read the PARENT's rejection, so one
-                    // declined submission marked every unpaid item under that
-                    // fine "Declined" — including items raised afterwards that
-                    // were never submitted at all.
                     const status = getPaymentStatus({
                       isPayable: fine.isPayable ?? !fine.isPending,
                       paymentState: fine.paymentState ?? (fine.isPending ? "pending" : "unpaid"),
@@ -500,7 +488,7 @@ export default function FinesFeesSelectionPage({
         <div className="relative sm:fixed sm:inset-x-0 sm:bottom-0 sm:z-[60] sm:border-t sm:border-border mt-8 sm:mt-0 bg-transparent sm:bg-background/95 sm:backdrop-blur-md px-0 sm:px-6 py-0 sm:py-4 sm:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:shadow-lg w-full">
           <div className="mx-auto max-w-5xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-4">
             <div className="min-w-0 text-center sm:text-left bg-white sm:bg-transparent rounded-2xl p-4 sm:p-0 border sm:border-none shadow-sm sm:shadow-none">
-              {isViewOnly ? (
+              {isViewOnly || !hasAnyPayableItems ? (
                 <>
                   <p className="text-xs text-muted-foreground font-medium">
                     Outstanding on record for this term
@@ -523,9 +511,9 @@ export default function FinesFeesSelectionPage({
                 </>
               )}
             </div>
-            {isViewOnly ? (
+            {isViewOnly || !hasAnyPayableItems ? (
               <Button variant="outline" onClick={() => setShowBackConfirm(true)} className="w-full sm:w-auto shrink-0 px-6 sm:px-8">
-                Back to Terms
+                Back to Organizations
               </Button>
             ) : (
               <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3 shrink-0 w-full sm:w-auto">
@@ -551,10 +539,15 @@ export default function FinesFeesSelectionPage({
           </div>
         </div>
       </div>
-      <BackConfirmationModal 
-        open={showBackConfirm} 
-        onOpenChange={setShowBackConfirm} 
-        onConfirm={() => onBack?.()} 
+      <BackConfirmationModal
+        open={showBackConfirm}
+        onOpenChange={setShowBackConfirm}
+        onConfirm={() => onBack?.()}
+      />
+      <StudentReceiptDialog
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+        data={activeReceipt}
       />
     </div>
   );

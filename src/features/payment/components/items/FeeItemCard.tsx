@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { FeeItem, FeeItemCardProps } from "../../types/types";
+import { FeeItemCardProps } from "../../types/types";
 
 const formatDisplayDate = (value?: unknown) => {
   if (!value) return null;
@@ -34,6 +34,11 @@ export function FeeItemCard({
   statusLabel,
   statusClassName,
 }: FeeItemCardProps) {
+  const displayAmount =
+    fee.paymentState === "verified" && (fee.paidAmount ?? 0) > 0
+      ? fee.paidAmount!
+      : fee.amount;
+
   return (
     <div
       role={isSelectable ? "button" : undefined}
@@ -46,12 +51,13 @@ export function FeeItemCard({
           onToggle(fee.id);
         }
       }}
-      className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${!isSelectable
+      className={`flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-colors ${
+        !isSelectable
           ? "bg-muted/40 border-border/50"
           : isSelected
             ? "bg-brand-green/10 border-brand-green cursor-pointer"
             : "bg-card border-border hover:bg-brand-green/5 cursor-pointer"
-        }`}
+      }`}
     >
       <Checkbox
         checked={isSelected}
@@ -81,9 +87,20 @@ export function FeeItemCard({
             Last rejected reason: {fee.latestRejectionReason}
           </p>
         )}
+        {fee.paymentState === "verified" && (
+          <p className="text-xs text-success font-medium">
+            {fee.receipt ? (
+              <>
+                Settled · <span className="font-mono">Receipt #{fee.receipt.receiptId}</span>
+              </>
+            ) : (
+              "Settled"
+            )}
+          </p>
+        )}
       </div>
       <span className="text-sm font-bold text-brand-green shrink-0 tabular-nums">
-        ₱{fee.amount.toFixed(2)}
+        ₱{displayAmount.toFixed(2)}
       </span>
     </div>
   );
